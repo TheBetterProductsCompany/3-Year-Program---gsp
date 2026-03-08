@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.cdnfonts.com">
 <style>
 @import url('https://fonts.cdnfonts.com/css/lemon-milk');
-@import url('https://fonts.cdnfonts.com/css/akira-expanded');
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap');
 
 :root {
   --stone: #F0EDE8;
@@ -33,7 +32,7 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 html { height:100%; }
 body {
-  font-family: 'Akira Expanded', 'Impact', sans-serif;
+  font-family: 'Satoshi', -apple-system, sans-serif;
   background: var(--stone);
   color: var(--black);
   min-height:100%;
@@ -64,7 +63,7 @@ body {
 #login input {
   width:300px; padding:18px 20px; background:rgba(240,237,232,.04);
   border:1px solid rgba(240,237,232,.1); color:var(--stone-light);
-  font-family:'Akira Expanded',sans-serif; font-size:14px; letter-spacing:5px;
+  font-family:'Satoshi',sans-serif; font-size:14px; letter-spacing:5px;
   text-align:center; outline:none; transition:border .3s;
 }
 #login input::placeholder { color:rgba(240,237,232,.15); font-size:11px; letter-spacing:4px; }
@@ -269,7 +268,7 @@ body {
 .set-input {
   width:100%; padding:10px 8px;
   background:var(--stone-light); border:1px solid var(--border);
-  font-family:'Akira Expanded',sans-serif; font-size:12px;
+  font-family:'Satoshi',sans-serif; font-size:12px;
   color:var(--black); outline:none; text-align:center;
   transition:border .2s;
 }
@@ -298,7 +297,7 @@ body {
 }
 .notes textarea {
   width:100%; min-height:80px; background:transparent; border:none;
-  font-family:'Akira Expanded',sans-serif; font-size:12px; color:var(--black);
+  font-family:'Satoshi',sans-serif; font-size:12px; color:var(--black);
   resize:vertical; outline:none; line-height:1.7;
 }
 .notes textarea::placeholder { color:var(--text-dim); font-size:11px; }
@@ -374,13 +373,13 @@ body {
 }
 .pr-fg input {
   padding:11px 14px; border:1px solid var(--border); background:var(--stone-light);
-  font-family:'Akira Expanded',sans-serif; font-size:12px; color:var(--black);
+  font-family:'Satoshi',sans-serif; font-size:12px; color:var(--black);
   outline:none; width:160px;
 }
 .pr-fg input:focus { border-color:var(--blue); }
 .pr-fg select {
   padding:11px 14px; border:1px solid var(--border); background:var(--stone-light);
-  font-family:'Akira Expanded',sans-serif; font-size:12px; color:var(--black);
+  font-family:'Satoshi',sans-serif; font-size:12px; color:var(--black);
   outline:none; width:200px;
 }
 .pr-add {
@@ -769,8 +768,8 @@ function getPhase3Day(w, dayIdx){
       warmup:[E('Foam Roll + Band Walks','5 min','Glute activation focus'),E('Goblet Squat','2×5','Pattern warm-up'),E('Empty Bar Squats','2×5','Bar path groove')],
       core:coreP3.slice(0,2),
       main:[
-        E('Back Squat — Work to Daily Max','~5-7 sets to technical max','Form breaks = that\'s the max. Not a grind max.'),
-        E('Back Squat Back-off','3×3 @ 90% of daily max','Quality reps — no grinding'),
+        E('Box Back Squat — Work to Daily Max','~5-7 sets to technical max','Form breaks = that\'s the max. Not a grind max.'),
+        E('Box Back Squat Back-off','3×3 @ 90% of daily max','Quality reps — no grinding'),
         E('BB Hip Thrust ('+tripPhase+')',tripProto,'Triphasic loading — glute force'),
         E('Hyper Extensions','3 × 12-15','Posterior core endurance'),
       ],
@@ -814,8 +813,8 @@ function getPhase3Day(w, dayIdx){
       warmup:[E('Full Dynamic Warm-up','10 min','A/B-skip, band walks, pogo jumps, hip openers')],
       core:coreP3,
       main:[
-        E('Back Squat — Work to Daily Max','~5-7 sets','Second heavy squat day of week'),
-        E('Back Squat Back-off','3×2 @ 90%','Crisp'),
+        E('Box Back Squat — Work to Daily Max','~5-7 sets','Second heavy squat day of week'),
+        E('Box Back Squat Back-off','3×2 @ 90%','Crisp'),
         E('Power Clean — Work to Daily Max','~5-7 sets','Back-to-back CNS loading'),
         E('Power Clean Back-off','3×2 @ 88%','Quality'),
         E('Bench Press','4×4 @ 82-87%','Maintain pressing strength'),
@@ -960,7 +959,7 @@ function getPhase5Day(w, dayIdx){
     const days = {
       0: { title:'MOVEMENT QUALITY', focus:'Light Squat + Mobility + Golf Application', duration:'50-60 min',
         warmup:[E('Full Dynamic Warm-up','10 min','Movement quality focus')],core:[E('Bird Dogs','3×10 each','Spinal stability'),E('Dead Bug','3×10 each','Anti-extension')],
-        main:[E('Back Squat','3×5 @ 60-65%','Perfect form — zero grind'),E('Front Squat','3×5 @ 60-65%','Upright posture check'),E('Banded Pull-Throughs','3×15','Posterior groove')],
+        main:[E('Box Back Squat','3×5 @ 60-65%','Perfect form — zero grind'),E('Front Squat','3×5 @ 60-65%','Upright posture check'),E('Banded Pull-Throughs','3×15','Posterior groove')],
         conditioning:[E('Reverse Hypers','3×12','Spinal maintenance')]
       },
       1: { title:'LIGHT UPPER', focus:'Maintenance Volume + Mobility', duration:'45-55 min',
@@ -1136,7 +1135,7 @@ function getNotes(w,d){ return load('notes',{})[w+'_'+d]||''; }
 function setNote(w,d,txt){ const n=load('notes',{}); n[w+'_'+d]=txt; save('notes',n); }
 
 function getPRs(){ return load('prs',{
-  'Back Squat':335,'Front Squat':265,'Power Clean':225,'Snatch':115,
+  'Box Back Squat':335,'Front Squat':265,'Power Clean':225,'Snatch':115,
   'Bench Press':285,'Pendlay Row':200,'BB Hip Thrust':0,'Weighted Pull-ups':50
 }); }
 function setPR(name,val){ const p=getPRs(); p[name]=val; save('prs',p); }
@@ -1396,19 +1395,21 @@ function parseExercise(detail, name){
 // ═══════════════════════════════════════════════════════════
 const EXERCISE_PR_MAP = {
   'Power Clean':'Power Clean', 'Front Squat':'Front Squat',
-  'Box Back Squat':'Back Squat', 'Back Squat':'Back Squat',
-  'Back Squat — Work to Daily Max':'Back Squat',
+  'Box Back Squat':'Box Back Squat', 'Back Squat':'Box Back Squat',
+  'Back Squat — Work to Daily Max':'Box Back Squat',
   'Front Squat — Work to Daily Max':'Front Squat',
   'Power Clean — Work to Daily Max':'Power Clean',
   'Snatch — Work to Daily Max':'Snatch',
-  'Back Squat Back-off':'Back Squat',
+  'Back Squat Back-off':'Box Back Squat',
+  'Box Back Squat Back-off':'Box Back Squat',
+  'Box Back Squat — Work to Daily Max':'Box Back Squat',
   'Front Squat Back-off':'Front Squat',
   'Power Clean Back-off':'Power Clean',
   'Snatch Back-off':'Snatch',
   'BB Hip Thrust':'BB Hip Thrust',
   'Flat Bench Press':'Bench Press', 'Bench Press':'Bench Press',
   'Bench Press — 1RM Test':'Bench Press',
-  'Box Back Squat — 1RM Test':'Back Squat',
+  'Box Back Squat — 1RM Test':'Box Back Squat',
   'Front Squat — 1RM Test':'Front Squat',
   'Power Clean — 1RM Test':'Power Clean',
   'Snatch — 1RM Test':'Snatch',
@@ -1496,7 +1497,7 @@ function renderStats(){
   const p = document.getElementById('p-stats');
   const prs = getPRs();
   const targets = {
-    'Back Squat':{cur:335,target:585},'Front Squat':{cur:265,target:405},
+    'Box Back Squat':{cur:335,target:585},'Front Squat':{cur:265,target:405},
     'Power Clean':{cur:225,target:315},'Snatch':{cur:115,target:185},
     'Bench Press':{cur:285,target:350},'Pendlay Row':{cur:200,target:315},
   };
