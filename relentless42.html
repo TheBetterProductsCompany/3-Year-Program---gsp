@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>THE RELENTLESS 42 AUDIT</title>
+<link rel="preconnect" href="https://fonts.cdnfonts.com">
+<style>
+@import url('https://fonts.cdnfonts.com/css/lemon-milk');
+@import url('https://fonts.cdnfonts.com/css/akira-expanded');
+
+:root {
+  --stone: #F0EDE8;
+  --stone-light: #F5F2ED;
+  --stone-mid: #E6E2DB;
+  --black: #141414;
+  --black-soft: #1C1C1C;
+  --blue: #0B1D33;
+  --blue-mid: #15294A;
+  --blue-accent: #1E3A5F;
+  --blue-light: #2A4D7A;
+  --text-dim: #8A8680;
+  --text-mid: #5C5954;
+  --border: rgba(20,20,20,0.07);
+  --border-dark: rgba(245,242,237,0.08);
+  --green: #2D6A4F;
+  --green-bg: rgba(45,106,79,0.08);
+  --red: #9B2C2C;
+  --red-bg: rgba(155,44,44,0.08);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { height:100%; }
+body {
+  font-family: 'Akira Expanded', 'Impact', sans-serif;
+  background: var(--stone);
+  color: var(--black);
+  min-height:100%;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ════════════════════════ LOGIN ════════════════════════ */
+#login {
+  position:fixed; inset:0; z-index:9999;
+  background: var(--blue);
+  display:flex; align-items:center; justify-content:center; flex-direction:column;
+  transition: opacity .5s, transform .5s;
+}
+#login.out { opacity:0; pointer-events:none; transform:scale(1.04); }
+.l-pre {
+  font-family:'LEMON MILK',sans-serif; font-size:11px; letter-spacing:8px;
+  color:rgba(240,237,232,.25); margin-bottom:48px; text-transform:uppercase;
+}
+.l-title {
+  font-family:'LEMON MILK',sans-serif; font-size:clamp(24px,6vw,38px);
+  letter-spacing:5px; color:var(--stone-light); margin-bottom:8px; text-transform:uppercase;
+}
+.l-sub {
+  font-size:10px; letter-spacing:6px; color:rgba(240,237,232,.2);
+  margin-bottom:44px; text-transform:uppercase;
+}
+#login input {
+  width:300px; padding:18px 20px; background:rgba(240,237,232,.04);
+  border:1px solid rgba(240,237,232,.1); color:var(--stone-light);
+  font-family:'Akira Expanded',sans-serif; font-size:14px; letter-spacing:5px;
+  text-align:center; outline:none; transition:border .3s;
+}
+#login input::placeholder { color:rgba(240,237,232,.15); font-size:11px; letter-spacing:4px; }
+#login input:focus { border-color:rgba(240,237,232,.28); }
+.l-btn {
+  margin-top:20px; padding:16px 56px; background:var(--stone-light); color:var(--blue);
+  font-family:'LEMON MILK',sans-serif; font-size:11px; letter-spacing:4px;
+  border:none; cursor:pointer; text-transform:uppercase; transition:all .25s;
+}
+.l-btn:hover { opacity:.88; transform:translateY(-1px); }
+.l-err {
+  margin-top:16px; font-size:10px; letter-spacing:2px; color:#C0392B;
+  opacity:0; transition:opacity .3s;
+}
+.l-err.on { opacity:1; }
+
+/* ════════════════════════ APP SHELL ════════════════════════ */
+#app { display:none; min-height:100vh; }
+#app.on { display:flex; }
+
+/* ── SIDEBAR ── */
+.sb {
+  width:62px; min-height:100vh; background:var(--blue);
+  display:flex; flex-direction:column; align-items:center;
+  padding:22px 0; position:fixed; left:0; top:0; bottom:0; z-index:100;
+}
+.sb-mark {
+  font-family:'LEMON MILK',sans-serif; font-size:9px; color:rgba(240,237,232,.2);
+  letter-spacing:2px; writing-mode:vertical-rl; transform:rotate(180deg);
+  margin-bottom:36px;
+}
+.sb-nav { display:flex; flex-direction:column; gap:8px; }
+.sb-btn {
+  width:44px; height:44px; display:flex; align-items:center; justify-content:center;
+  background:transparent; border:1px solid transparent; color:rgba(240,237,232,.28);
+  cursor:pointer; transition:all .2s; position:relative; border-radius:0;
+}
+.sb-btn:hover { color:rgba(240,237,232,.6); background:rgba(240,237,232,.03); }
+.sb-btn.on { color:var(--stone-light); background:rgba(240,237,232,.07); border-color:rgba(240,237,232,.08); }
+.sb-btn .tip {
+  position:absolute; left:54px; background:var(--black); color:var(--stone-light);
+  font-size:9px; letter-spacing:2px; padding:6px 12px; white-space:nowrap;
+  opacity:0; pointer-events:none; transition:opacity .2s; text-transform:uppercase;
+}
+.sb-btn:hover .tip { opacity:1; }
+
+/* ── MAIN ── */
+.main { margin-left:62px; flex:1; min-height:100vh; }
+
+/* ── TOP BAR ── */
+.topbar {
+  background:var(--black); padding:16px 28px;
+  display:flex; align-items:center; justify-content:space-between;
+  position:sticky; top:0; z-index:50; flex-wrap:wrap; gap:10px;
+}
+.tb-left { display:flex; align-items:center; gap:18px; }
+.live {
+  display:flex; align-items:center; gap:8px;
+  background:rgba(240,237,232,.05); padding:9px 16px; border:1px solid rgba(240,237,232,.06);
+}
+.live-dot {
+  width:6px; height:6px; background:var(--green); border-radius:50%;
+  animation:blink 2s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:.35} }
+.live span {
+  font-family:'LEMON MILK',sans-serif; font-size:10px; letter-spacing:3px;
+  color:var(--stone-light); text-transform:uppercase;
+}
+.phase-tag {
+  font-size:9px; letter-spacing:2px; color:rgba(240,237,232,.4);
+  padding:6px 14px; border:1px solid rgba(240,237,232,.06); text-transform:uppercase;
+}
+.tb-right { display:flex; align-items:center; gap:18px; }
+.clock {
+  font-family:'LEMON MILK',sans-serif; font-size:clamp(16px,3vw,24px);
+  letter-spacing:3px; color:var(--stone-light); font-variant-numeric:tabular-nums;
+}
+.date-display {
+  font-size:10px; letter-spacing:3px; color:rgba(240,237,232,.4); text-transform:uppercase;
+}
+
+/* ── WEEK NAV ── */
+.weeknav {
+  display:flex; align-items:center; gap:12px; padding:14px 28px;
+  background:var(--stone); border-bottom:1px solid var(--border);
+}
+.wn-btn {
+  width:34px; height:34px; display:flex; align-items:center; justify-content:center;
+  background:transparent; border:1px solid var(--border); color:var(--text-dim);
+  cursor:pointer; font-size:16px; transition:all .2s;
+}
+.wn-btn:hover { border-color:var(--blue); color:var(--blue); }
+.wn-label {
+  font-family:'LEMON MILK',sans-serif; font-size:12px; letter-spacing:3px;
+  color:var(--blue); text-transform:uppercase;
+}
+
+/* ── DAY TABS ── */
+.dtabs {
+  display:flex; background:var(--stone-mid); border-bottom:1px solid var(--border);
+  overflow-x:auto; padding:0 28px;
+}
+.dtab {
+  padding:15px 18px; font-family:'LEMON MILK',sans-serif; font-size:10px;
+  letter-spacing:3px; color:var(--text-dim); cursor:pointer;
+  border:none; border-bottom:2px solid transparent; background:transparent;
+  text-transform:uppercase; transition:all .2s; white-space:nowrap;
+}
+.dtab:hover { color:var(--black); }
+.dtab.on { color:var(--blue); border-bottom-color:var(--blue); }
+.dtab.done::after { content:'✓'; margin-left:6px; font-size:9px; color:var(--green); }
+
+/* ── CONTENT PANELS ── */
+.panel { display:none; padding:32px; max-width:960px; }
+.panel.on { display:block; }
+
+/* ── DAY HEADER ── */
+.dh-code {
+  font-family:'LEMON MILK',sans-serif; font-size:clamp(20px,4vw,28px);
+  letter-spacing:4px; color:var(--blue); margin-bottom:18px; text-transform:uppercase;
+}
+.dh-meta { display:flex; gap:24px; flex-wrap:wrap; margin-bottom:32px; }
+.dh-m { display:flex; flex-direction:column; gap:4px; }
+.dh-m-l {
+  font-size:9px; letter-spacing:3px; color:var(--text-dim); text-transform:uppercase;
+}
+.dh-m-v {
+  font-family:'LEMON MILK',sans-serif; font-size:12px; letter-spacing:2px;
+  color:var(--black); text-transform:uppercase;
+}
+
+/* ── SECTIONS ── */
+.sec { margin-bottom:28px; }
+.sec-h {
+  font-family:'LEMON MILK',sans-serif; font-size:11px; letter-spacing:4px;
+  color:var(--blue); padding:12px 0; border-bottom:1px solid var(--border);
+  margin-bottom:16px; text-transform:uppercase;
+}
+
+/* ── EXERCISE ITEMS ── */
+.ex {
+  display:flex; align-items:flex-start; padding:14px 0;
+  border-bottom:1px solid rgba(20,20,20,.04);
+  cursor:pointer; transition:background .15s;
+}
+.ex:hover { background:rgba(11,29,51,.015); }
+.ex.open { background:rgba(11,29,51,.025); cursor:default; padding:14px 12px; margin:0 -12px; }
+.ex-dot {
+  width:6px; height:6px; background:var(--blue); border-radius:50%;
+  margin-top:8px; margin-right:16px; flex-shrink:0; opacity:.35;
+}
+.ex-body { flex:1; }
+.ex-name {
+  font-size:13px; letter-spacing:.8px; color:var(--black); margin-bottom:4px;
+  font-weight:normal;
+}
+.ex-detail { font-size:12px; color:var(--text-dim); letter-spacing:.4px; }
+.ex-note {
+  font-size:10.5px; color:var(--text-mid); margin-top:4px;
+  font-style:italic; letter-spacing:.2px;
+}
+
+/* ── TAP TOGGLE ── */
+.ex-toggle {
+  font-size:8px; letter-spacing:3px; color:var(--blue); opacity:.3;
+  margin-top:6px; text-transform:uppercase; transition:opacity .2s;
+}
+.ex:hover .ex-toggle { opacity:.6; }
+.ex.open .ex-toggle { display:none; }
+
+/* ── EXPANDABLE SET ROWS ── */
+.ex-sets {
+  display:none; margin-top:12px; padding-top:10px;
+  border-top:1px solid rgba(11,29,51,.07);
+}
+.ex.open .ex-sets { display:block; }
+
+.sets-hdr {
+  display:grid; grid-template-columns:40px 1fr 1fr 1fr 56px; gap:8px;
+  margin-bottom:10px; padding-bottom:7px; align-items:center;
+  border-bottom:1px dashed rgba(11,29,51,.06);
+}
+.sets-hdr span {
+  font-size:8px; letter-spacing:2.5px; color:var(--text-dim); text-transform:uppercase;
+}
+.sets-hdr .sh-c { text-align:center; }
+
+.set-row {
+  display:grid; grid-template-columns:40px 1fr 1fr 1fr 56px; gap:8px;
+  margin-bottom:8px; align-items:center;
+}
+.set-label {
+  font-family:'LEMON MILK',sans-serif; font-size:9px; letter-spacing:2px;
+  color:var(--blue); text-transform:uppercase; opacity:.6;
+}
+.set-target-wt {
+  font-family:'LEMON MILK',sans-serif; font-size:11px; letter-spacing:1px;
+  color:var(--blue); opacity:.5; text-align:center; padding:9px 6px;
+  background:rgba(11,29,51,.04); border:1px dashed rgba(11,29,51,.08);
+}
+.set-input {
+  width:100%; padding:10px 8px;
+  background:var(--stone-light); border:1px solid var(--border);
+  font-family:'Akira Expanded',sans-serif; font-size:12px;
+  color:var(--black); outline:none; text-align:center;
+  transition:border .2s;
+}
+.set-input:focus { border-color:var(--blue); background:white; }
+.set-input::placeholder { color:rgba(138,134,128,.4); font-size:10px; }
+
+/* ── % BADGE ── */
+.pct-badge {
+  display:flex; align-items:center; justify-content:center;
+  font-family:'LEMON MILK',sans-serif; font-size:10px; letter-spacing:1px;
+  padding:8px 4px; text-align:center; min-width:52px;
+  transition:all .3s;
+}
+.pct-badge.hit { background:var(--green-bg); color:var(--green); }
+.pct-badge.miss { background:var(--red-bg); color:var(--red); }
+.pct-badge.neutral { background:rgba(11,29,51,.03); color:var(--text-dim); }
+
+/* ── SESSION NOTES ── */
+.notes {
+  margin-top:32px; padding:20px; background:rgba(11,29,51,.03);
+  border:1px solid rgba(11,29,51,.05);
+}
+.notes-h {
+  font-family:'LEMON MILK',sans-serif; font-size:10px; letter-spacing:3px;
+  color:var(--blue); margin-bottom:12px; text-transform:uppercase;
+}
+.notes textarea {
+  width:100%; min-height:80px; background:transparent; border:none;
+  font-family:'Akira Expanded',sans-serif; font-size:12px; color:var(--black);
+  resize:vertical; outline:none; line-height:1.7;
+}
+.notes textarea::placeholder { color:var(--text-dim); font-size:11px; }
+
+/* ── COMPLETE BTN ── */
+.comp-btn {
+  margin-top:24px; width:100%; padding:20px;
+  background:var(--blue); color:var(--stone-light);
+  font-family:'LEMON MILK',sans-serif; font-size:11px; letter-spacing:4px;
+  border:none; cursor:pointer; text-transform:uppercase; transition:all .25s;
+}
+.comp-btn:hover { background:var(--blue-mid); transform:translateY(-1px); }
+.comp-btn.done { background:var(--green); cursor:default; }
+.comp-btn.done:hover { transform:none; }
+
+/* ── PLAN VIEW ── */
+.ph-title {
+  font-family:'LEMON MILK',sans-serif; font-size:15px; letter-spacing:4px;
+  color:var(--blue); margin-bottom:8px; text-transform:uppercase;
+}
+.ph-desc {
+  font-size:11px; color:var(--text-dim); letter-spacing:1px; margin-bottom:22px;
+}
+.pw-row {
+  display:flex; align-items:center; padding:14px 16px;
+  border-bottom:1px solid var(--border); cursor:pointer; transition:background .2s;
+}
+.pw-row:hover { background:rgba(11,29,51,.02); }
+.pw-row.cur { background:rgba(11,29,51,.04); border-left:3px solid var(--blue); }
+.pw-num {
+  font-family:'LEMON MILK',sans-serif; font-size:11px; letter-spacing:2px;
+  color:var(--blue); width:80px; text-transform:uppercase;
+}
+.pw-focus { font-size:11px; color:var(--text-mid); flex:1; }
+.pw-status { font-size:9px; letter-spacing:2px; color:var(--text-dim); text-transform:uppercase; }
+
+/* ── STATS VIEW ── */
+.sg { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:22px; }
+.sc {
+  background:rgba(11,29,51,.03); border:1px solid rgba(11,29,51,.05); padding:20px;
+}
+.sc-l {
+  font-size:9px; letter-spacing:3px; color:var(--text-dim);
+  text-transform:uppercase; margin-bottom:8px;
+}
+.sc-v {
+  font-family:'LEMON MILK',sans-serif; font-size:clamp(24px,4vw,32px);
+  letter-spacing:2px; color:var(--blue);
+}
+.sc-s { font-size:10px; color:var(--text-dim); margin-top:4px; }
+.prog-bar {
+  width:100%; height:5px; background:var(--stone-mid); margin-top:10px; overflow:hidden;
+}
+.prog-fill { height:100%; background:var(--blue); transition:width .5s; }
+
+/* ── PRs VIEW ── */
+.pr-title {
+  font-family:'LEMON MILK',sans-serif; font-size:13px; letter-spacing:3px;
+  color:var(--blue); margin-bottom:16px; text-transform:uppercase;
+}
+.pr-row {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:14px 0; border-bottom:1px solid var(--border);
+}
+.pr-name { font-size:12px; color:var(--black); }
+.pr-val {
+  font-family:'LEMON MILK',sans-serif; font-size:13px; letter-spacing:1px; color:var(--blue);
+}
+.pr-form { display:flex; gap:12px; margin-top:20px; align-items:flex-end; flex-wrap:wrap; }
+.pr-fg { display:flex; flex-direction:column; gap:4px; }
+.pr-fg label {
+  font-size:9px; letter-spacing:2px; color:var(--text-dim); text-transform:uppercase;
+}
+.pr-fg input {
+  padding:11px 14px; border:1px solid var(--border); background:var(--stone-light);
+  font-family:'Akira Expanded',sans-serif; font-size:12px; color:var(--black);
+  outline:none; width:160px;
+}
+.pr-fg input:focus { border-color:var(--blue); }
+.pr-fg select {
+  padding:11px 14px; border:1px solid var(--border); background:var(--stone-light);
+  font-family:'Akira Expanded',sans-serif; font-size:12px; color:var(--black);
+  outline:none; width:200px;
+}
+.pr-add {
+  padding:11px 22px; background:var(--blue); color:var(--stone-light);
+  font-family:'LEMON MILK',sans-serif; font-size:9px; letter-spacing:2px;
+  border:none; cursor:pointer; text-transform:uppercase;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .sb{width:50px;} .main{margin-left:50px;}
+  .topbar{padding:12px 14px;} .dtabs{padding:0 10px;}
+  .dtab{padding:12px 12px;font-size:9px;letter-spacing:2px;}
+  .panel{padding:22px 14px;}
+  .sg{grid-template-columns:1fr;}
+  .pr-form{flex-direction:column;}
+  .pr-fg input,.pr-fg select{width:100%;}
+  .weeknav{padding:12px 14px;}
+  .set-row{grid-template-columns:32px 1fr 1fr 1fr 44px;}
+  .sets-hdr{grid-template-columns:32px 1fr 1fr 1fr 44px;}
+  .sb-btn .tip{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="login">
+  <div class="l-pre">AUDIT SYSTEM</div>
+  <div class="l-title">RELENTLESS 42</div>
+  <div class="l-sub">40 WEEK PROTOCOL</div>
+  <input type="password" id="pw" placeholder="ENTER CODE" autocomplete="off">
+  <button class="l-btn" onclick="doLogin()">ACCESS</button>
+  <div class="l-err" id="lerr">INCORRECT ACCESS CODE</div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="app">
+  <!-- Sidebar -->
+  <div class="sb">
+    <div class="sb-mark">R42</div>
+    <div class="sb-nav">
+      <button class="sb-btn on" onclick="nav('today')" data-v="today">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="7"/><polyline points="8 4 8 8 11 9.5"/></svg>
+        <span class="tip">Today</span>
+      </button>
+      <button class="sb-btn" onclick="nav('plan')" data-v="plan">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="14" height="14"/><line x1="1" y1="6" x2="15" y2="6"/><line x1="6" y1="1" x2="6" y2="15"/></svg>
+        <span class="tip">Plan</span>
+      </button>
+      <button class="sb-btn" onclick="nav('stats')" data-v="stats">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 14V7M8 14V3M3 14v-4"/></svg>
+        <span class="tip">Stats</span>
+      </button>
+      <button class="sb-btn" onclick="nav('prs')" data-v="prs">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="8 1 10 5.5 15 6.2 11.5 9.5 12.3 14.5 8 12.2 3.7 14.5 4.5 9.5 1 6.2 6 5.5"/></svg>
+        <span class="tip">PRs</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- Top Bar -->
+    <div class="topbar">
+      <div class="tb-left">
+        <div class="live"><div class="live-dot"></div><span>Live Session</span></div>
+        <div class="phase-tag" id="phaseTag">Phase 1 · Week 1</div>
+      </div>
+      <div class="tb-right">
+        <div class="clock" id="clock">00:00:00</div>
+        <div class="date-display" id="dateDisp">MON 09 - MAR - 2026</div>
+      </div>
+    </div>
+
+    <!-- Week Nav -->
+    <div class="weeknav">
+      <button class="wn-btn" onclick="chgWeek(-1)">‹</button>
+      <span class="wn-label" id="weekLbl">Week 1 / 40</span>
+      <button class="wn-btn" onclick="chgWeek(1)">›</button>
+    </div>
+
+    <!-- Day Tabs -->
+    <div class="dtabs" id="dtabs"></div>
+
+    <!-- Panels -->
+    <div class="panel on" id="p-today"></div>
+    <div class="panel" id="p-plan"></div>
+    <div class="panel" id="p-stats"></div>
+    <div class="panel" id="p-prs"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════
+const PW='Spyder1';
+function doLogin(){
+  if(document.getElementById('pw').value===PW){
+    document.getElementById('login').classList.add('out');
+    document.getElementById('app').classList.add('on');
+    localStorage.setItem('r42auth','1');
+    startApp();
+  } else {
+    document.getElementById('lerr').classList.add('on');
+    setTimeout(()=>document.getElementById('lerr').classList.remove('on'),2000);
+  }
+}
+document.getElementById('pw').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+if(localStorage.getItem('r42auth')==='1'){
+  document.getElementById('login').classList.add('out');
+  document.getElementById('app').classList.add('on');
+  window.addEventListener('DOMContentLoaded',startApp);
+}
+
+// ═══════════════════════════════════════════════════════════
+// PROGRAM DATA — THE RELENTLESS 42 FULL 40-WEEK PROTOCOL
+// ═══════════════════════════════════════════════════════════
+const DAYS = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
+const DAYNAMES = ['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY'];
+
+// Phase definitions
+const PHASES = [
+  {n:'FOUNDATION', wks:[1,8], desc:'GPP + Structural Balance — Fix core, hips, snatch mechanics. Build aerobic base.'},
+  {n:'STRENGTH ACCUMULATION', wks:[9,16], desc:'Max Strength Hypertrophy — Eastern Bloc linear periodization. Heavy volume. Romanian loading wave.'},
+  {n:'POWER CONVERSION', wks:[17,24], desc:'Strength → Explosiveness — Bulgarian daily maxes. Triphasic loading. Cluster sets.'},
+  {n:'INTEGRATION', wks:[25,32], desc:'Athletic Mastery — Complex/contrast pairs. Sprint mechanics. Full kinetic chain sequencing.'},
+  {n:'PEAK + TEST', wks:[33,40], desc:'Express & Measure Everything — Taper into maximal performance. Test all 1RMs, sprint times, club speed.'}
+];
+
+function getPhase(w){return PHASES.find(p=>w>=p.wks[0]&&w<=p.wks[1])||PHASES[0];}
+function getPhaseNum(w){return PHASES.findIndex(p=>w>=p.wks[0]&&w<=p.wks[1])+1;}
+
+// ── Helper to build exercise objects ──
+function E(name,detail,note){return{name,detail,note:note||''};}
+
+// ═══════════════════════════════════════════════════════════
+// PHASE 1: WEEKS 1-8
+// ═══════════════════════════════════════════════════════════
+function getPhase1Day(w, dayIdx){
+  const deload = (w===4||w===8);
+  const int = deload ? '55-62%' : w<=2 ? '65-75%' : w<=3 ? '75-80%' : w<=6 ? '78-85%' : '83-87%';
+
+  const coreBlock = [
+    E('Bird Dogs','3 × 8 each side','Zero lumbar rotation — opposite arm/leg'),
+    E('Dead Bug','3 × 8 each side','Lower back FLAT into floor at all times'),
+    E('Ab Roller (kneeling)','4 × 6-8 reps','From knees until 3×12 achieved'),
+    E('Side Plank Dynamic','3 × 10 dips each','Hips level — no pike or sag'),
+    E('Landmine Rotation','3 × 8 each side','Hips STAY SQUARE — rotate T-spine only'),
+    E('Hanging Leg Raises','3 × 8-12','Posterior pelvic tilt before lifting'),
+    E('Copenhagen Dips','3 × 6-10 each','Slow eccentric 3 seconds'),
+  ];
+
+  const mobilityBlock = [
+    E('Hip 90/90 Rotations','2 min each side','Most important mobility drill — non-negotiable daily'),
+    E('Kneeling T-Spine Opener','10 reps each side','Golf lives in thoracic rotation'),
+    E('PVC Over and Back','3 × 10','Shoulder girdle prep'),
+    E('Forward Split Holds','3 × 45 sec each side','Progress 1cm per week'),
+    E('Lateral Split Holds','3 × 45 sec','Hip base development'),
+    E('Ankle Dorsiflexion Drill','3 × 15 each side','Non-negotiable for sprint & squat depth'),
+    E('Reverse Crab Reaches','3 × 8 each side','Anterior chain opening'),
+  ];
+
+  // Snatch loading by week
+  const snatchLoad = w<=1?'Empty bar technique':w<=2?'60% of max':w<=3?'65%':deload&&w===4?'Technique only':w<=5?'70%':w<=6?'75%':w<=7?'79%':'Light + fast';
+  // Squat/Clean volume by week
+  const sqVol = w<=1?'4×6 @ 70%':w<=2?'4×5 @ 73%':w<=3?'5×5 @ 76%':w===4?'3×3 @ 60%':w<=5?'5×4 @ 79%':w<=6?'5×3 @ 83%':w<=7?'4×3 @ 86%':'3×2 @ 62%';
+
+  const days = {
+    0: { // MON — Lower Power
+      title:'LOWER POWER',
+      focus:'Power Clean + Front Squat + Core',
+      duration:'75-85 min',
+      warmup:[E('Foam Roll Lower Body','5 min','Quads, glutes, IT band, adductors'),E('Band Pull-Aparts','2 × 15','Shoulder activation'),E('Goblet Squat Hold','2 × 30 sec','Hip opener + ankle mobility')],
+      core:coreBlock.slice(0,4),
+      main:[
+        E('Power Clean',sqVol,'Triple extension — hip to shoulder sequencing'),
+        E('Front Squat',deload?'3×3 @ 60%':w<=2?'4×5 @ 70%':w<=4?'4×4 @ 75%':'4×3 @ 80%','Anterior pillar — upright posture king'),
+        E('BB Hip Thrust',deload?'3×6 @ 60%':'4×8 @ '+int,'Glute force — sprinting/rotation engine'),
+        E('Banded Pull-Throughs','3 × 12','Posterior chain groove — zero spinal shear'),
+      ],
+      conditioning:[E('Reverse Hypers','3 × 12','Spinal decompression after every heavy squat session')]
+    },
+    1: { // TUE — Aerobic / Mobility
+      title:'AEROBIC / MOBILITY',
+      focus:'Row + Full Mobility Sequence',
+      duration:'60-70 min',
+      warmup:[E('Light Row','5 min @ Z1','Build into pace gradually')],
+      core:coreBlock.slice(0,3),
+      main:[
+        E('Row',w<=2?'5×5min @ Zone 2':w<=4?'5×6min @ Zone 2':w<=6?'Row 30min @ Z1-Z2':'4×8min @ Z2-Z3','Cardiac output — aerobic base building'),
+        E('KOT Lunge','3 × 8 each side','Knee health — patellar tendon bulletproofing'),
+      ],
+      conditioning:mobilityBlock
+    },
+    2: { // WED — Upper Pull + Core
+      title:'UPPER PULL + CORE',
+      focus:'Pendlay Row + Pull-ups + Chin-ups + Core Circuit',
+      duration:'70-80 min',
+      warmup:[E('Band Dislocates','2 × 12','Shoulder girdle prep'),E('Scap Pull-ups','2 × 8','Activate lats + lower traps'),E('Light Row','3 min','Blood flow')],
+      core:coreBlock.slice(3,7),
+      main:[
+        E('Pendlay Row',deload?'3×5 @ 60%':'5×5 @ '+(w<=2?'65%':w<=4?'70%':w<=6?'75%':'80%'),'Horizontal pulling power — progress 5 lbs/week'),
+        E('Weighted Pull-ups',deload?'3×5 BW':'4×5 @ +50 lbs','Vertical density — lat length'),
+        E('Chin-ups','3 × 8 bodyweight','Supinated grip — bicep tendon + different lat angle'),
+        E('Serratus Wall Slides','3 × 12','Fixes scapular winging — shoulder health for club path'),
+      ],
+      conditioning:[E('Farmer\'s Carries','4 × 40m','Total body tension — grip endurance')]
+    },
+    3: { // THU — Snatch Remediation
+      title:'SNATCH REMEDIATION',
+      focus:'Snatch from Hang + Box Back Squat + Glutes',
+      duration:'75-85 min',
+      warmup:[E('Snatch Grip Deadlift','3 × 5 @ light','Pattern groove — wide grip activation'),E('Overhead Squat Hold','3 × 20 sec','Overhead stability check'),E('Hip 90/90','2 min each side','Internal rotation prep')],
+      core:coreBlock.slice(0,3),
+      main:[
+        E('Hang Snatch',w<=2?'5×3 empty bar technique':w<=4?'5×3 @ '+snatchLoad:'5×2 @ '+snatchLoad,'115 lb snatch at your strength = technique gap. Fix it here.'),
+        E('Box Back Squat',sqVol,'Absolute force engine — pause at box'),
+        E('BB Hip Thrust',deload?'3×6 @ 60%':'4×6 @ '+int,'Glute force production'),
+        E('Hyper Extensions','3 × 12','Posterior core endurance'),
+      ],
+      conditioning:[E('Reverse Hypers','3 × 12','Spinal decompression — non-optional maintenance')]
+    },
+    4: { // FRI — Full Athletic
+      title:'FULL ATHLETIC',
+      focus:'Sprint + Jumps + Rotational Power + Carries',
+      duration:'80-90 min',
+      warmup:[E('A-Skip / B-Skip Drills','3 × 20m each','Sprint mechanics prep'),E('Ankle Pogo Jumps','2 × 15','Ankle stiffness activation'),E('Lateral Shuffle','2 × 20m','Multi-directional warm-up')],
+      core:coreBlock.slice(2,5),
+      main:[
+        E('Linear Sprints 10-40m',deload?'4 × 20m @ 80%':'6 × 10m + 4 × 20m + 2 × 40m','First-step explosion — golf stance activation'),
+        E('Trap Bar Jumps',deload?'3×3 @ light':'4×5 @ moderate','Loaded vertical explosiveness'),
+        E('Lateral MB Throws','5 × 5 each side','Rotational projectile velocity — measure distance monthly'),
+        E('Rotational MB Slam','4 × 6 each side','Maximum intent every rep'),
+        E('Kneeling Landmine Rot. Press','3 × 8 each side','Spiral line force connection'),
+      ],
+      conditioning:[E('Farmer\'s Carries','4 × 40m heavy','Total body tension — grip')]
+    },
+    5: { // SAT — Aerobic + Unilateral
+      title:'AEROBIC + UNILATERAL',
+      focus:'400m Repeats or 5K + BSS + Nordic + Copenhagen',
+      duration:'75-90 min',
+      warmup:[E('Light Jog / Row','5 min','Blood flow'),E('Walking Lunges','2 × 10 each','Dynamic stretch')],
+      core:[coreBlock[5],coreBlock[6]],
+      main:[
+        E('Conditioning',w<=3?'2×(4×400m) w/ 90s rest':w===4?'Row 30min @ Z1-Z2':w<=6?'3×(3×400m) w/ 75s rest':w===7?'2000m Row Test (benchmark)':'Easy 20min row','Energy system development — aerobic base is the foundation'),
+        E('Bulgarian Split Squat','4 × 8 each side @ '+int,'Unilateral strength king'),
+        E('SLRDL','3 × 8 each side','Single-leg hinge mastery'),
+        E('Nordic Curls','4 × 4-6','Eccentric hamstring protection — slow 4 sec negative'),
+        E('Copenhagen Dips','3 × 8 each','Adductor bulletproofing'),
+      ],
+      conditioning:[E('Deficit Reverse Lunge','3 × 8 each','Greater hip flexor + glute demand')]
+    },
+    6: { // SUN — Rest + Flexibility
+      title:'RECOVERY / MOBILITY',
+      focus:'Static Split Work + T-Spine + Hip 90/90',
+      duration:'30-40 min',
+      warmup:[E('Light Walk or Cycling','5-10 min','Blood flow only — no intensity')],
+      core:[],
+      main:mobilityBlock,
+      conditioning:[E('Breathing / Parasympathetic Work','5 min','Box breathing 4-4-4-4 — activate recovery')]
+    }
+  };
+  return days[dayIdx];
+}
+
+// ═══════════════════════════════════════════════════════════
+// PHASE 2: WEEKS 9-16
+// ═══════════════════════════════════════════════════════════
+function getPhase2Day(w, dayIdx){
+  const deload=(w===12||w===16);
+  const sqProto=w===9?'10-8-6-5 @ 65-75-80-83%':w===10?'10-8-6-5 @ 68-77-82-85%':w===11?'8-6-5-3 @ 72-80-85-88%':w===12?'DELOAD: 3×5 @ 65%':w===13?'8-6-4-2 @ 75-82-87-91%':w===14?'6-4-3-2 @ 78-84-89-93%':w===15?'5-3-2-1 @ 80-86-91-95%':'DELOAD: 3×4 @ 62%';
+  const cleanSnatch=w===9?'Clean 5×3@78% | Snatch 5×3@77%':w===10?'Clean 5×2@82% | Snatch 5×2@81%':w===11?'Clean 4×2@85% | Snatch 4×2@83%':w===12?'Technique only @ 70%':w===13?'Clean 4×(1+2)@87% | Snatch 4×2@85%':w===14?'Clean 3×(1+2)@90% | Snatch 3×1@87%':w===15?'Clean heavy single | Snatch heavy single':'Light/fast @ 65%';
+  const pullWeight=w<=10?'+50 lbs':w<=12?'+55 lbs':'+60 lbs';
+
+  const coreP2=[
+    E('Ab Roller','4 × 8-10','Progress toward full extension'),
+    E('Side Plank Dynamic','3 × 12 each','Maintain golf anti-sway'),
+    E('Landmine Rotation','3 × 10 each','Heavier load than Phase 1'),
+    E('Hanging Leg Raises','3 × 12','Full range — toes to bar goal'),
+  ];
+
+  const days = {
+    0: { title:'HEAVY LOWER', focus:'Box Back Squat (Wave) + RDL', duration:'80-90 min',
+      warmup:[E('Foam Roll','5 min','Lower body focus'),E('Goblet Squat','2×8','Hip opener'),E('Band Walks','2×12 each','Glute activation')],
+      core:coreP2.slice(0,2),
+      main:[
+        E('Box Back Squat',sqProto,'Eastern Bloc wave loading — rest 3-4 min between top sets'),
+        E('BB Hip Thrust',deload?'3×6@65%':'4×6 @ 80-85%','Glute force engine'),
+        E('Banded Pull-Throughs','3 × 15','Posterior chain groove'),
+        E('Hyper Extensions','3 × 15','Posterior core endurance — add weight when possible'),
+      ],
+      conditioning:[E('Reverse Hypers','3 × 12','Spinal decompression — after every heavy squat')]
+    },
+    1: { title:'HEAVY UPPER PULL', focus:'Pendlay Row + Weighted Pull-ups + Chin-ups', duration:'75-85 min',
+      warmup:[E('Band Pull-Aparts','3×15','Rear delt activation'),E('Scap Pull-ups','2×8','Lat engagement'),E('Light Row','3 min','Blood flow')],
+      core:coreP2.slice(2,4),
+      main:[
+        E('Pendlay Row','5×5 progressing weekly','Start 65% est 1RM — add 5 lbs/week minimum'),
+        E('Weighted Pull-ups','4×5 @ '+pullWeight,'Vertical density — lat length-tension'),
+        E('Chin-ups','3 × 8 BW','Supinated lat recruitment + bicep tendon health'),
+        E('Serratus Wall Slides','3 × 12','After every upper session — scapular winging fix'),
+        E('Farmer\'s Carries','4 × 40m heavy','Total body tension + grip'),
+      ],
+      conditioning:[]
+    },
+    2: { title:'OLYMPIC LIFT DAY', focus:'Power Clean + Snatch + Front Squat', duration:'80-90 min',
+      warmup:[E('Snatch Grip DL','3×3 light','Pattern groove'),E('Muscle Clean','2×5','Pathway warm-up'),E('OHS Hold','2×20 sec','Overhead stability')],
+      core:coreP2,
+      main:[
+        E('Power Clean + Snatch',cleanSnatch,'Technique + loading progression'),
+        E('Front Squat',deload?'3×3@65%':'4×4 @ 78-85%','Anterior pillar king — upright posture'),
+        E('Kneeling Landmine Rot. Press','3 × 10 each','Spiral line force'),
+      ],
+      conditioning:[E('Reverse Hypers','3 × 12','Decompress after Olympic loading')]
+    },
+    3: { title:'AEROBIC + UNILATERAL', focus:'Row 40min + BSS + SLRDL + Nordic', duration:'70-80 min',
+      warmup:[E('Light Row','5 min @ Z1','Build gradually')],
+      core:[coreP2[0]],
+      main:[
+        E('Row','40 min @ Zone 2','Cardiac output — Z2 heart rate target'),
+        E('Bulgarian Split Squat','4 × 8 each @ 75-80%','Unilateral strength king'),
+        E('SLRDL','3 × 8 each side','Single-leg hinge mastery'),
+        E('Nordic Curls','4 × 5-6','Eccentric hamstring — 4 sec negative'),
+        E('KOT Lunge','3 × 8 each','Knee health — patellar tendon'),
+      ],
+      conditioning:[]
+    },
+    4: { title:'UPPER PRESS + CORE', focus:'Bench + Landmine Press + Core Circuit', duration:'75-85 min',
+      warmup:[E('Band Dislocates','2×12','Shoulder prep'),E('Push-up Complex','2×10','Pec/shoulder activation'),E('Light DB Press','2×8','Groove pattern')],
+      core:coreP2,
+      main:[
+        E('Flat Bench Press',deload?'3×5@65%':'5×5 @ 78-85%','Horizontal pressing power'),
+        E('Landmine Press','4 × 8 each arm','Spiral-line activation — shoulder-safe arc'),
+        E('Dips',deload?'3×8 BW':'4 × 8-10 weighted','Triceps + lower pec development'),
+      ],
+      conditioning:[E('Sled Push/Pull','6 × 20m','Pure force — zero joint compression recovery')]
+    },
+    5: { title:'FULL POWER DAY', focus:'Hip Thrust + Trap Bar Jumps + Sprint + MB Throws', duration:'80-90 min',
+      warmup:[E('Dynamic Warm-up','8 min','A-skip, B-skip, lateral shuffle, carioca'),E('Pogo Jumps','2×15','Ankle stiffness')],
+      core:coreP2.slice(0,2),
+      main:[
+        E('BB Hip Thrust',deload?'3×5@65%':'4×5 @ 83-88%','Glute force — sprinting/rotation engine'),
+        E('Trap Bar Jumps','4 × 5 @ moderate-heavy','Loaded vertical explosiveness'),
+        E('Linear Sprints','6×10m + 4×20m + 2×40m','Acceleration + max velocity'),
+        E('Lateral MB Throws','5 × 5 each side','Rotational velocity = clubhead speed'),
+        E('Rotational MB Slam','4 × 6 each side','Maximum intent every rep'),
+      ],
+      conditioning:[E('Copenhagen Dips','3 × 10 each','Adductor bulletproofing')]
+    },
+    6: { title:'RECOVERY / MOBILITY', focus:'Split Progress + Hip 90/90 + T-Spine', duration:'30-40 min',
+      warmup:[E('Light Walk','10 min','Active recovery — blood flow only')],
+      core:[],
+      main:[
+        E('Hip 90/90 Rotations','3 min each side','Internal rotation — daily non-negotiable'),
+        E('Kneeling T-Spine Opener','12 reps each','Thoracic rotation for golf'),
+        E('Forward Split Holds','3 × 60 sec each side','Within 2 inches of floor by W16'),
+        E('Lateral Split Holds','3 × 45 sec','Hip base development'),
+        E('PVC Over and Back','3 × 10','Shoulder girdle maintenance'),
+        E('Ankle Dorsiflexion Drill','3 × 15 each','Sprint mechanics + squat depth'),
+        E('Reverse Crab Reaches','3 × 10 each','Anterior chain opening'),
+      ],
+      conditioning:[E('Breathing Work','5 min','Box breathing — parasympathetic activation')]
+    }
+  };
+  return days[dayIdx];
+}
+
+// ═══════════════════════════════════════════════════════════
+// PHASE 3: WEEKS 17-24
+// ═══════════════════════════════════════════════════════════
+function getPhase3Day(w, dayIdx){
+  const deload=(w===23||w===24);
+  const tripPhase=w<=18?'ECCENTRIC (5s down, 1s up)':w<=20?'ISOMETRIC (3s pause)':w<=22?'CONCENTRIC (explosive)':'DELOAD + TEST';
+  const tripProto=w<=18?'4×4 @ 78%':w<=20?'4×4 @ 80%':w<=22?'5×3 @ 85%':'3×3 @ 70%';
+
+  const coreP3=[
+    E('Ab Roller (extended)','4 × 10','Progress toward full extension from toes'),
+    E('Side Plank Dynamic','3 × 15 each','Increased reps — golf anti-sway'),
+    E('Landmine Rotation (heavier)','4 × 8 each','Progressive overload on transverse plane'),
+    E('Hanging Leg Raises','4 × 10','Full ROM — anti-extension mastery'),
+  ];
+
+  const days = {
+    0: { title:'BACK SQUAT DAILY MAX', focus:'Daily Max Single + Back-offs', duration:'80-90 min',
+      warmup:[E('Foam Roll + Band Walks','5 min','Glute activation focus'),E('Goblet Squat','2×5','Pattern warm-up'),E('Empty Bar Squats','2×5','Bar path groove')],
+      core:coreP3.slice(0,2),
+      main:[
+        E('Back Squat — Work to Daily Max','~5-7 sets to technical max','Form breaks = that\'s the max. Not a grind max.'),
+        E('Back Squat Back-off','3×3 @ 90% of daily max','Quality reps — no grinding'),
+        E('BB Hip Thrust ('+tripPhase+')',tripProto,'Triphasic loading — glute force'),
+        E('Hyper Extensions','3 × 12-15','Posterior core endurance'),
+      ],
+      conditioning:[E('Reverse Hypers','3 × 12','Spinal decompression — non-optional')]
+    },
+    1: { title:'POWER CLEAN DAILY MAX', focus:'Clean Max + Back-offs + Upper Pull', duration:'80-90 min',
+      warmup:[E('Muscle Clean','3×3','Pathway activation'),E('Hang Clean','2×3 @ 60%','Speed work'),E('Scap Pull-ups','2×8','Lat prep')],
+      core:coreP3.slice(2,4),
+      main:[
+        E('Power Clean — Work to Daily Max','~6-8 sets to technical max','Triple extension IS the downswing'),
+        E('Power Clean Back-off','3×2 @ 88% of daily max','Crisp technique — no power leak'),
+        E('Pendlay Row','5×3 @ 82-87%','Horizontal pulling power — heavy'),
+        E('Weighted Pull-ups','4×3 @ +60-70 lbs','Heavy vertical pull density'),
+      ],
+      conditioning:[E('Sled Push','8×20m heavy','Leg drive = ground force into swing')]
+    },
+    2: { title:'FRONT SQUAT DAILY MAX', focus:'FS Max + Back-offs + Rotational Power', duration:'80-90 min',
+      warmup:[E('T-Spine Opener','2×8 each','Thoracic prep for front rack'),E('Front Squat','2×3 @ 60%','Pattern groove'),E('Hip 90/90','2 min each','IR prep')],
+      core:coreP3.slice(0,2),
+      main:[
+        E('Front Squat — Work to Daily Max','~5-7 sets to technical max','Anterior pillar test — upright or fail'),
+        E('Front Squat Back-off','3×3 @ 90% of daily max','Quality volume'),
+        E('Lateral MB Throws','6×5 each side','Focus on LAG STORAGE in backswing position'),
+        E('Landmine Rotational Press (standing)','4×6 each','Standing with hip drive'),
+        E('Rotational MB Slam','4×6 each','Maximum intent'),
+      ],
+      conditioning:[]
+    },
+    3: { title:'SNATCH DAILY MAX', focus:'Snatch Max + Back-offs + Accessories', duration:'80-90 min',
+      warmup:[E('Snatch Grip DL','3×3','Wide grip warm-up'),E('Hang Snatch','3×2 @ 60%','Speed + position'),E('OHS','2×3','Overhead stability')],
+      core:coreP3.slice(2,4),
+      main:[
+        E('Snatch — Work to Daily Max','~6-8 sets to technical max','Vertical RFD — overhead stability'),
+        E('Snatch Back-off','3×2 @ 87% of daily max','Crisp reception — no forward lean'),
+        E('Deficit Reverse Lunge','4×6 each @ heavy','Greater hip flexor + glute demand'),
+        E('Nordic Curls','4 × 5','Eccentric hamstring protection'),
+      ],
+      conditioning:[E('Kneeling Landmine Rot. Press','3×8 each','Spiral line connection')]
+    },
+    4: { title:'SQUAT + CLEAN SAME DAY', focus:'Back Squat + Power Clean + Expression', duration:'100 min',
+      warmup:[E('Full Dynamic Warm-up','10 min','A/B-skip, band walks, pogo jumps, hip openers')],
+      core:coreP3,
+      main:[
+        E('Back Squat — Work to Daily Max','~5-7 sets','Second heavy squat day of week'),
+        E('Back Squat Back-off','3×2 @ 90%','Crisp'),
+        E('Power Clean — Work to Daily Max','~5-7 sets','Back-to-back CNS loading'),
+        E('Power Clean Back-off','3×2 @ 88%','Quality'),
+        E('Bench Press','4×4 @ 82-87%','Maintain pressing strength'),
+      ],
+      conditioning:[E('Reverse Hypers','3 × 15','Decompress — long session')]
+    },
+    5: { title:'POWER EXPRESSION DAY', focus:'Jumps + Sprints + MB Throws — No Daily Max', duration:'75-85 min',
+      warmup:[E('Dynamic Warm-up','8 min','Full movement prep'),E('Pogo Jumps','2×15','Ankle stiffness')],
+      core:coreP3.slice(0,2),
+      main:[
+        E('Linear Sprints','8×10m + 4×20m + 2×40m','Express everything built'),
+        E('Trap Bar Jumps','5×4 @ moderate-heavy','Loaded vertical power'),
+        E('Depth Jumps','4×5','Amortization & reactive stiffness'),
+        E('Lateral MB Throws','5×5 each','Rotational velocity expression'),
+        E('Broad Jumps','4×4','Horizontal power output'),
+      ],
+      conditioning:[E('Sled Pull (backward)','4×20m','Quad activation + knee health')]
+    },
+    6: { title:'RECOVERY / MOBILITY', focus:'Passive Stretching Only — Splits + Hip 90/90', duration:'30-40 min',
+      warmup:[E('Light Walk','10 min','Blood flow — zero intensity')],
+      core:[],
+      main:[
+        E('Hip 90/90 Rotations','3 min each side','Internal rotation — daily'),
+        E('Forward Split Holds','4 × 60 sec each side','Full or within 1 inch by W24'),
+        E('Lateral Split Holds','3 × 60 sec','Hip base nearing full'),
+        E('Kneeling T-Spine Opener','12 reps each','Thoracic rotation maintenance'),
+        E('PVC Over and Back','3 × 10','Shoulder girdle health'),
+        E('Ankle Dorsiflexion','3 × 15 each','Sprint + squat prep'),
+      ],
+      conditioning:[E('Cold/Heat Therapy','10-15 min','Contrast therapy recommended after Saturdays')]
+    }
+  };
+  return days[dayIdx];
+}
+
+// ═══════════════════════════════════════════════════════════
+// PHASE 4: WEEKS 25-32
+// ═══════════════════════════════════════════════════════════
+function getPhase4Day(w, dayIdx){
+  const deload=(w===28||w===32);
+  const days = {
+    0: { title:'COMPLEX PAIR — LOWER', focus:'Squat → Depth Jump + Hip Thrust → Broad Jump', duration:'85-95 min',
+      warmup:[E('Dynamic Warm-up','8 min','Full prep — emphasis on hip activation'),E('Pogo Jumps','2×15','Ankle stiffness'),E('Band Walks','2×12 each','Glute medius')],
+      core:[E('Ab Roller (full ext)','4×10','From toes if capable'),E('Side Plank Dynamic','3×15 each','Lateral stability')],
+      main:[
+        E('Box Back Squat','4×4 @ 85%','4 min rest after squats'),
+        E('→ Depth Jump','4×5','10 sec transition from squat — post-activation potentiation'),
+        E('BB Hip Thrust','4×4 @ 87%','3 min rest then jump'),
+        E('→ Broad Jump','4×4','Express horizontal power — post-activation'),
+        E('Nordic Curls','4 × 5-6','Eccentric hamstring protection'),
+      ],
+      conditioning:[E('Reverse Hypers','3 × 15','Spinal decompression')]
+    },
+    1: { title:'COMPLEX PAIR — UPPER + ROTATION', focus:'Row → MB Throw + Clean → Trap Bar Jump', duration:'85-95 min',
+      warmup:[E('Band Pull-Aparts','3×15','Rear delt'),E('Scap Pull-ups','2×8','Lat activation'),E('Muscle Clean','2×3','Pathway')],
+      core:[E('Landmine Rotation (heavy)','4×8 each','Transverse plane torque'),E('Hanging Leg Raises','4×12','Anti-extension mastery')],
+      main:[
+        E('Pendlay Row','4×4 @ 85%','Rest 4 min then throw'),
+        E('→ Med Ball Rot. Throw','4×5 each','10-12 sec transition — rotational velocity'),
+        E('Power Clean','4×2 @ 88%','Rest then jump'),
+        E('→ Trap Bar Jump','4×4','8-10 sec transition — loaded vertical'),
+        E('Weighted Pull-ups','4×3 @ +65-75 lbs','Heavy vertical density'),
+      ],
+      conditioning:[E('Serratus Wall Slides','3×12','Scapular health maintenance')]
+    },
+    2: { title:'SPRINT + CONDITIONING', focus:'Sprint Blocks + Rowing Intervals', duration:'75-85 min',
+      warmup:[E('A-Skip / B-Skip','3×20m each','Sprint mechanics prep'),E('Ankle Pogo Jumps','2×15','Stiffness')],
+      core:[E('Ab Roller','3×10','Anti-extension'),E('Bird Dogs','3×10 each','Spinal stability')],
+      main:[
+        E('Linear Sprints 10/20/40m','8×10m + 4×20m + 2×40m','Acceleration blocks — first step quickness'),
+        E('Row Intervals',w<=27?'8×3min @ 1:50/500m':w<=30?'6×4min @ 1:47/500m':'4×5min @ 1:45/500m','Progress pace each 2-week block'),
+        E('Sled Pull (backward)','6×20m','Quad activation + knee health in terminal extension'),
+      ],
+      conditioning:[]
+    },
+    3: { title:'COMPLEX PAIR — FRONT SQUAT + POWER', focus:'Front Squat → Pogo + Accessories', duration:'80-90 min',
+      warmup:[E('T-Spine Opener','2×8 each','Thoracic prep'),E('Front Squat','2×3 @ 60%','Groove')],
+      core:[E('Side Plank Dynamic','3×15 each','Golf anti-sway'),E('Copenhagen Dips','3×10 each','Adductor power')],
+      main:[
+        E('Front Squat','4×3 @ 85%','Rest then jump'),
+        E('→ Pogo Jumps','4×10','Express ankle stiffness post-loading'),
+        E('Landmine Press','4×6 each','Spiral-line + shoulder-safe pressing'),
+        E('Deficit Reverse Lunge','4×6 each @ heavy','Hip flexor + glute overload'),
+        E('SLRDL','3×8 each side','Single-leg hinge mastery'),
+      ],
+      conditioning:[E('Farmer\'s Carries','4×40m heavy','Grip + total body tension')]
+    },
+    4: { title:'400m REPEATS + POWER', focus:'400m Intervals + MB Rotational Work', duration:'80-90 min',
+      warmup:[E('Light Jog','5 min','Build gradually'),E('Dynamic Stretching','5 min','Hip + ankle focus')],
+      core:[E('Landmine Rotation','4×8 each','Heavy transverse torque'),E('Rotational MB Slam','4×6 each','Maximum intent')],
+      main:[
+        E('400m Repeats',deload?'4×400m w/ 2min rest':'6-8×400m w/ 2min rest','Target: sub-70 sec 400m by W32'),
+        E('Lateral MB Throws','6×5 each side','Lag storage in backswing — clubhead speed transfer'),
+        E('Kneeling Landmine Rot. Press','4×6 each','Spiral line — hip drive emphasis'),
+        E('Bench Press','4×4 @ 83-87%','Maintain pressing strength'),
+        E('Dips','3×8-10 weighted','Triceps + lower pec'),
+      ],
+      conditioning:[]
+    },
+    5: { title:'FULL ATHLETIC EXPRESSION', focus:'Olympic Lifts + Sprint + Jump Complex', duration:'85-95 min',
+      warmup:[E('Full Dynamic Warm-up','10 min','Everything — this is the big day')],
+      core:[E('Ab Roller','4×10','Full extension'),E('Hanging Leg Raises','4×10','Toes to bar')],
+      main:[
+        E('Power Clean','4×2 @ 87-90%','Triple extension — express power'),
+        E('Snatch','4×2 @ 83-87%','Vertical RFD expression'),
+        E('Depth Jumps','4×5','Reactive stiffness — amortization'),
+        E('Broad Jumps','4×4','Horizontal power'),
+        E('Sprints 40m','4×40m @ max effort','Full speed expression'),
+      ],
+      conditioning:[E('Sled Push/Pull','6×20m','Zero joint compression — force application')]
+    },
+    6: { title:'RECOVERY / MOBILITY', focus:'DAILY Split Holds + Hip 90/90 + Recovery', duration:'35-45 min',
+      warmup:[E('Light Walk or Cycling','10 min','Zero intensity')],
+      core:[],
+      main:[
+        E('Hip 90/90 (loaded)','2×10 each side w/ 5lb plate','Loaded rotations — progression from BW'),
+        E('Forward Split Holds','4×60 sec each side','Should achieve full splits by W30'),
+        E('Lateral Split Holds','3×45 sec daily hold','Hip base must be full before peak'),
+        E('Kneeling T-Spine Opener','12 reps each','Thoracic maintenance'),
+        E('PVC Over and Back','3×10','Shoulder girdle'),
+        E('Ankle Dorsiflexion','3×15 each','Maintain'),
+        E('Reverse Crab Reaches','3×10 each','Anterior chain opening'),
+      ],
+      conditioning:[E('Cold/Heat Contrast','15 min','Mandatory after Saturdays — recovery is training')]
+    }
+  };
+  return days[dayIdx];
+}
+
+// ═══════════════════════════════════════════════════════════
+// PHASE 5: WEEKS 33-40
+// ═══════════════════════════════════════════════════════════
+function getPhase5Day(w, dayIdx){
+  const isDeload = w>=37;
+  const isTesting = w===36;
+  const isPeak = w===33;
+  const volMod = w===34?'Reduce 30%':w===35?'Reduce 50%':w===36?'PEAK WEEK — 1RM attempts':isDeload?'60-65% movement quality only':'Full volume final push';
+  const int = w===33?'90-95%':w===34?'85-90%':w===35?'80-85%':w===36?'MAX':isDeload?'60-65%':'moderate';
+
+  if(isDeload){
+    // W37-40 active deload
+    const days = {
+      0: { title:'MOVEMENT QUALITY', focus:'Light Squat + Mobility + Golf Application', duration:'50-60 min',
+        warmup:[E('Full Dynamic Warm-up','10 min','Movement quality focus')],core:[E('Bird Dogs','3×10 each','Spinal stability'),E('Dead Bug','3×10 each','Anti-extension')],
+        main:[E('Back Squat','3×5 @ 60-65%','Perfect form — zero grind'),E('Front Squat','3×5 @ 60-65%','Upright posture check'),E('Banded Pull-Throughs','3×15','Posterior groove')],
+        conditioning:[E('Reverse Hypers','3×12','Spinal maintenance')]
+      },
+      1: { title:'LIGHT UPPER', focus:'Maintenance Volume + Mobility', duration:'45-55 min',
+        warmup:[E('Band Work','5 min','Shoulder prep')],core:[E('Ab Roller','3×8','Maintenance'),E('Landmine Rotation','3×8 each','Light transverse')],
+        main:[E('Pendlay Row','3×5 @ 60%','Maintenance'),E('Pull-ups','3×5 BW','Easy volume'),E('Bench Press','3×5 @ 60%','Maintain pattern'),E('Landmine Press','3×8 each light','Shoulder health')],
+        conditioning:[]
+      },
+      2: { title:'LIGHT CONDITIONING', focus:'Easy Row + Mobility', duration:'45-55 min',
+        warmup:[E('Light Row','5 min','Z1 only')],core:[],
+        main:[E('Row','20-25min @ Z1-Z2','Easy cardiac output'),E('KOT Lunge','3×8 each','Joint health'),E('Sled Push (light)','4×20m','Blood flow')],
+        conditioning:[E('Mobility Circuit','15 min','Hip 90/90 + T-spine + splits')]
+      },
+      3: { title:'GOLF APPLICATION', focus:'Light Power + Rotational Skill', duration:'50-60 min',
+        warmup:[E('Dynamic Warm-up','8 min','Golf-specific movement')],core:[E('Side Plank','3×10 each','Anti-sway maintenance')],
+        main:[E('Lateral MB Throws','4×5 each @ light-moderate','Rotational skill — not max effort'),E('Kneeling Landmine Rot. Press','3×8 each','Spiral line maintenance'),E('Light Sprint Work','4×20m @ 80%','Movement quality')],
+        conditioning:[E('Farmer\'s Carries','3×30m moderate','Grip + tension')]
+      },
+      4: { title:'MOVEMENT QUALITY', focus:'Pattern Maintenance', duration:'40-50 min',
+        warmup:[E('Full Warm-up','8 min','Easy')],core:[E('Ab Roller','3×8','Maintenance'),E('Bird Dogs','3×8 each','Stability')],
+        main:[E('Power Clean','5×1 @ 60-65%','Crisp singles — movement quality only'),E('Snatch','5×1 @ 60-65%','Perfect pattern'),E('Light BSS','3×6 each BW','Unilateral maintenance')],
+        conditioning:[]
+      },
+      5: { title:'LIGHT EXPRESSION', focus:'Easy Jumps + MB Work', duration:'45-55 min',
+        warmup:[E('Dynamic Warm-up','8 min','Full body')],core:[],
+        main:[E('Pogo Jumps','3×10','Ankle stiffness'),E('Broad Jumps','3×3','Easy power'),E('Lateral MB Throws','3×4 each','Skill maintenance'),E('Row','15min @ Z1','Flush')],
+        conditioning:[E('Full Mobility Circuit','15 min','Everything')]
+      },
+      6: { title:'RECOVERY / MOBILITY', focus:'Full Recovery Protocol', duration:'30-40 min',
+        warmup:[E('Light Walk','10 min','Blood flow')],core:[],
+        main:[E('Hip 90/90','3 min each','Maintain full IR'),E('Forward Splits','3×60 sec each','Maintain'),E('Lateral Splits','3×45 sec','Maintain'),E('T-Spine Opener','10 each','Maintain'),E('PVC Over and Back','3×10','Shoulders'),E('Breathing Work','5 min','Box breathing 4-4-4-4')],
+        conditioning:[]
+      }
+    };
+    return days[dayIdx];
+  }
+
+  // W33-36 peak/test weeks
+  const days = {
+    0: { title: isTesting?'1RM TEST — SQUAT + DEADLIFT':'HEAVY LOWER — PEAK', focus: isTesting?'ALL LIFTS TESTED':'Back Squat + Front Squat @ '+int, duration:'85-95 min',
+      warmup:[E('Full Dynamic Warm-up','10 min','Peak CNS prep')],
+      core:[E('Ab Roller','3×10','Anti-extension'),E('Side Plank','3×12 each','Anti-sway')],
+      main: isTesting ? [
+        E('Box Back Squat — 1RM Test','Work to max','Record. Compare to 335 lb baseline.'),
+        E('Front Squat — 1RM Test','Work to max','Target: 390-405 lbs'),
+        E('BB Hip Thrust — 1RM Test','Work to max','Glute force peak'),
+      ] : [
+        E('Box Back Squat','4×3 @ '+int,'Peak loading — quality'),
+        E('Front Squat','4×2 @ '+int,'Anterior pillar peak'),
+        E('BB Hip Thrust','4×3 @ 87-90%','Glute engine peak'),
+      ],
+      conditioning:[E('Reverse Hypers','3×12','Decompress')]
+    },
+    1: { title: isTesting?'1RM TEST — CLEAN + SNATCH + ROW':'OLYMPIC LIFT PEAK', focus: isTesting?'All Olympic lifts tested':'Clean + Snatch @ '+int, duration:'85-95 min',
+      warmup:[E('Olympic Warm-up Sequence','10 min','Muscle clean + hang snatch + OHS')],
+      core:[E('Hanging Leg Raises','3×12','Anti-extension'),E('Landmine Rotation','3×8 each','Transverse')],
+      main: isTesting ? [
+        E('Power Clean — 1RM Test','Work to max','Target: 305-315 lbs'),
+        E('Snatch — 1RM Test','Work to max','Target: 180-185 lbs. From 115 lb baseline.'),
+        E('Pendlay Row — 1RM Test','Work to max','Target: 305-315 lbs'),
+      ] : [
+        E('Power Clean','5×2 @ '+int,'Technical max quality'),
+        E('Snatch','5×2 @ '+int,'Vertical RFD peak'),
+        E('Pendlay Row','4×3 @ '+int,'Horizontal pull peak'),
+        E('Weighted Pull-ups','4×3 @ +80-85 lbs','Max vertical density'),
+      ],
+      conditioning:[]
+    },
+    2: { title: w===34?'SPRINT TEST + JUMP TEST':w===35?'ROW 2000m TEST + CLUB SPEED':isTesting?'BENCH + REMAINING TESTS':'SPRINT + CONDITIONING PEAK', 
+      focus: w===34?'Sprint + Vertical + Broad Jump tests':w===35?'2000m Row + Clubhead speed test':isTesting?'Bench 1RM + Final metrics':'Sprints + Row @ '+int, duration:'80-90 min',
+      warmup:[E('Full Dynamic Warm-up','10 min','Test day prep')],
+      core:[E('Ab Roller','3×8','Maintenance')],
+      main: w===34 ? [
+        E('100m Sprint Test','3 attempts, best of 3','Target: Sub 11.2 sec'),
+        E('Vertical Jump Test','3 attempts','Target: 35-37 inches'),
+        E('Broad Jump Test','3 attempts','Target: 9\'6\"+'),
+        E('40m Sprint','3 attempts','Record best'),
+      ] : w===35 ? [
+        E('2000m Row Test','1 all-out effort','Target: Sub 6:30 (1:37/500m)'),
+        E('Driver Clubhead Speed Test','10 swings, record best','Target: 133+ mph'),
+        E('400m Sprint Test','2 attempts','Target: Sub 65 seconds'),
+      ] : isTesting ? [
+        E('Bench Press — 1RM Test','Work to max','Target: 345-355 lbs'),
+        E('Weighted Pull-ups — Max Test','+90 lbs x max reps','Target: +90 lbs × 5'),
+        E('Ab Roller from Full Extension','Test 3×15','Core benchmark'),
+        E('Side Plank','Test 3×20','Anti-sway benchmark'),
+        E('Plank Hold','Max time','Target: 3 min'),
+      ] : [
+        E('Sprints','6×10m + 4×20m + 2×40m','Peak sprint work'),
+        E('Row Intervals','4×5min @ 1:42-45/500m','Peak conditioning'),
+        E('Sled Push/Pull','6×20m','Force application'),
+      ],
+      conditioning:[]
+    },
+    3: { title:'ROTATIONAL POWER + ACCESSORIES', focus:'MB Throws + Landmine + Unilateral', duration:'70-80 min',
+      warmup:[E('Dynamic Warm-up','8 min','Rotational focus')],
+      core:[E('Landmine Rotation','4×8 each','Peak transverse torque'),E('Rotational MB Slam','4×6 each','Maximum intent')],
+      main:[
+        E('Lateral MB Throws','6×5 each side','Peak rotational velocity — measure distance'),
+        E('Kneeling Landmine Rot. Press','4×6 each','Spiral line peak'),
+        E('BSS','4×6 each @ 80-85%','Unilateral strength maintenance'),
+        E('Nordic Curls','4×5','Hamstring protection maintenance'),
+        E('Copenhagen Dips','3×10 each','Adductor maintenance'),
+      ],
+      conditioning:[E('Farmer\'s Carries','4×40m heavy','Grip + tension peak')]
+    },
+    4: { title:'UPPER PRESS + POWER', focus:'Bench + Landmine Press + Dips', duration:'70-80 min',
+      warmup:[E('Band Work + Push-ups','5 min','Press prep')],
+      core:[E('Ab Roller','3×10','Maintenance'),E('Side Plank','3×12 each','Anti-sway')],
+      main:[
+        E('Bench Press','4×3 @ '+int,'Horizontal press peak'),
+        E('Landmine Press','4×6 each arm @ heavy','Spiral-line peak'),
+        E('Dips','4×6-8 weighted heavy','Triceps + lower pec peak'),
+        E('Serratus Wall Slides','3×12','Scapular maintenance'),
+      ],
+      conditioning:[E('Sled Push','4×20m','Active recovery tool')]
+    },
+    5: { title:'FULL EXPRESSION DAY', focus:'Everything — Jumps + Sprints + MB + Lifts', duration:'85-95 min',
+      warmup:[E('Full Dynamic Warm-up','10 min','Peak day')],
+      core:[E('Ab Roller','3×10','Peak'),E('Hanging Leg Raises','3×10','Peak')],
+      main:[
+        E('Trap Bar Jumps','4×4 @ heavy','Loaded vertical peak'),
+        E('Depth Jumps','4×5','Reactive stiffness peak'),
+        E('Sprints 10/20/40m','6×10m + 3×20m + 2×40m','Sprint peak'),
+        E('Lateral MB Throws','5×5 each','Rotational peak'),
+        E('Broad Jumps','4×4','Horizontal peak'),
+      ],
+      conditioning:[E('Sled Push/Pull','4×20m','Finish strong')]
+    },
+    6: { title:'RECOVERY / MOBILITY', focus:'Splits + Full Recovery Protocol', duration:'35-45 min',
+      warmup:[E('Light Walk','10 min','Zero intensity')],core:[],
+      main:[
+        E('Hip 90/90 (loaded)','2×10 each w/ plate','Maintain full IR'),
+        E('Forward Splits','4×60 sec each','Should be full by now'),
+        E('Lateral Splits','3×60 sec','Full hip base'),
+        E('T-Spine Opener','12 each','Maintain'),
+        E('PVC Over and Back','3×10','Maintain'),
+        E('Full Breathing Protocol','5-10 min','Box breathing + parasympathetic activation'),
+      ],
+      conditioning:[]
+    }
+  };
+  return days[dayIdx];
+}
+
+// ═══════════════════════════════════════════════════════════
+// MASTER: GET DAY DATA
+// ═══════════════════════════════════════════════════════════
+function getDayData(week, dayIdx){
+  const pn = getPhaseNum(week);
+  if(pn===1) return getPhase1Day(week, dayIdx);
+  if(pn===2) return getPhase2Day(week, dayIdx);
+  if(pn===3) return getPhase3Day(week, dayIdx);
+  if(pn===4) return getPhase4Day(week, dayIdx);
+  return getPhase5Day(week, dayIdx);
+}
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let curWeek = 1;
+let curDay = 0; // 0=MON
+let curView = 'today';
+const PROG_START = new Date(2026, 2, 9); // Mon March 9 2026 = Week 1 Day 1
+
+function save(k,v){ try{localStorage.setItem('r42_'+k,JSON.stringify(v))}catch(e){} }
+function load(k,d){ try{const v=localStorage.getItem('r42_'+k);return v?JSON.parse(v):d}catch(e){return d} }
+
+function getCompletions(){ return load('completions',{}); }
+function setCompletion(w,d,v){ const c=getCompletions(); c[w+'_'+d]=v; save('completions',c); }
+function isComplete(w,d){ return !!getCompletions()[w+'_'+d]; }
+
+function getNotes(w,d){ return load('notes',{})[w+'_'+d]||''; }
+function setNote(w,d,txt){ const n=load('notes',{}); n[w+'_'+d]=txt; save('notes',n); }
+
+function getPRs(){ return load('prs',{
+  'Back Squat':335,'Front Squat':265,'Power Clean':225,'Snatch':115,
+  'Bench Press':285,'Pendlay Row':200,'BB Hip Thrust':0,'Weighted Pull-ups':50
+}); }
+function setPR(name,val){ const p=getPRs(); p[name]=val; save('prs',p); }
+
+// ═══════════════════════════════════════════════════════════
+// CLOCK + DATE
+// ═══════════════════════════════════════════════════════════
+function updateClock(){
+  const now = new Date(new Date().toLocaleString('en-US',{timeZone:'America/Toronto'}));
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const s = String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('clock').textContent = h+':'+m+':'+s;
+
+  const dayNames = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  const monthNames = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const dn = dayNames[now.getDay()];
+  const dd = String(now.getDate()).padStart(2,'0');
+  const mn = monthNames[now.getMonth()];
+  const yr = now.getFullYear();
+  document.getElementById('dateDisp').textContent = dn+' '+dd+' - '+mn+' - '+yr;
+}
+
+// ═══════════════════════════════════════════════════════════
+// CALCULATE CURRENT WEEK
+// ═══════════════════════════════════════════════════════════
+function calcCurrentWeek(){
+  const now = new Date(new Date().toLocaleString('en-US',{timeZone:'America/Toronto'}));
+  const diff = now - PROG_START;
+  if(diff < 0) return {week:1, day:0};
+  const totalDays = Math.floor(diff / (1000*60*60*24));
+  const week = Math.floor(totalDays / 7) + 1;
+  const day = totalDays % 7; // 0=Mon
+  return {week: Math.min(Math.max(week,1),40), day: Math.min(day,6)};
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════
+function renderDayTabs(){
+  const el = document.getElementById('dtabs');
+  el.innerHTML = '';
+  DAYS.forEach((d,i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'dtab' + (i===curDay?' on':'') + (isComplete(curWeek,i)?' done':'');
+    btn.textContent = d;
+    btn.onclick = ()=>{ curDay=i; renderAll(); };
+    el.appendChild(btn);
+  });
+}
+
+function renderWorkout(){
+  const p = document.getElementById('p-today');
+  const data = getDayData(curWeek, curDay);
+  if(!data){ p.innerHTML='<div style="padding:40px;color:var(--text-dim)">No data for this day.</div>'; return; }
+
+  const phase = getPhase(curWeek);
+  const pn = getPhaseNum(curWeek);
+  let h = '';
+
+  // Day Header
+  h += `<div class="dh-code">W${curWeek} — ${DAYNAMES[curDay]} — ${data.title}</div>`;
+  h += `<div class="dh-meta">`;
+  h += `<div class="dh-m"><div class="dh-m-l">Phase</div><div class="dh-m-v">${phase.n}</div></div>`;
+  h += `<div class="dh-m"><div class="dh-m-l">Week</div><div class="dh-m-v">${curWeek} / 40</div></div>`;
+  h += `<div class="dh-m"><div class="dh-m-l">Focus</div><div class="dh-m-v">${data.focus}</div></div>`;
+  h += `<div class="dh-m"><div class="dh-m-l">Duration</div><div class="dh-m-v">${data.duration}</div></div>`;
+  h += `</div>`;
+
+  // Warmup
+  if(data.warmup && data.warmup.length){
+    h += `<div class="sec"><div class="sec-h">WARM-UP</div>`;
+    data.warmup.forEach((ex,i)=>{ h += exHTML(ex,'wu',i); });
+    h += `</div>`;
+  }
+
+  // Core Activation
+  if(data.core && data.core.length){
+    h += `<div class="sec"><div class="sec-h">CORE ACTIVATION</div>`;
+    data.core.forEach((ex,i)=>{ h += exHTML(ex,'co',i); });
+    h += `</div>`;
+  }
+
+  // Main Work
+  if(data.main && data.main.length){
+    h += `<div class="sec"><div class="sec-h">MAIN WORK</div>`;
+    data.main.forEach((ex,i)=>{ h += exHTML(ex,'mw',i); });
+    h += `</div>`;
+  }
+
+  // Conditioning
+  if(data.conditioning && data.conditioning.length){
+    h += `<div class="sec"><div class="sec-h">CONDITIONING / FINISHER</div>`;
+    data.conditioning.forEach((ex,i)=>{ h += exHTML(ex,'cn',i); });
+    h += `</div>`;
+  }
+
+  // Session Notes
+  const note = getNotes(curWeek, curDay);
+  h += `<div class="notes"><div class="notes-h">SESSION NOTES</div>`;
+  h += `<textarea placeholder="Log weights, RPE, how it felt..." onchange="setNote(${curWeek},${curDay},this.value)">${note}</textarea></div>`;
+
+  // Complete Button
+  const done = isComplete(curWeek, curDay);
+  h += `<button class="comp-btn${done?' done':''}" onclick="markComplete()" id="compBtn">${done?'SESSION COMPLETE ✓':'MARK SESSION COMPLETE'}</button>`;
+
+  p.innerHTML = h;
+}
+
+function exHTML(ex, section, idx){
+  const eid = `${curWeek}_${curDay}_${section}_${idx}`;
+  const parsed = parseExercise(ex.detail, ex.name);
+  const numSets = parsed.sets;
+  const logged = getSetLog(eid);
+  const targetWt = calcTarget(ex.name, parsed.pct);
+
+  let h = `<div class="ex" onclick="toggleEx(this, event)" data-eid="${eid}">`;
+  h += `<div class="ex-dot"></div><div class="ex-body">`;
+  h += `<div class="ex-name">${ex.name}</div>`;
+  h += `<div class="ex-detail">${ex.detail}</div>`;
+  if(ex.note) h += `<div class="ex-note">${ex.note}</div>`;
+
+  if(numSets > 0){
+    h += `<div class="ex-toggle">TAP TO LOG SETS</div>`;
+    h += `<div class="ex-sets" onclick="event.stopPropagation()">`;
+
+    // Column headers
+    h += `<div class="sets-hdr">`;
+    h += `<span>SET</span><span>TARGET</span><span>WEIGHT</span><span>REPS</span><span class="sh-c">%</span>`;
+    h += `</div>`;
+
+    // Per-set target reps from wave loading
+    const repScheme = parsed.repScheme; // e.g. [10,8,6,5] or [6,6,6,6]
+
+    for(let s=1; s<=numSets; s++){
+      const sv = logged[s] || {};
+      const setTarget = targetWt ? Math.round(targetWt) : 0;
+      const setReps = repScheme[s-1] || parsed.reps || '';
+      const actualWt = sv.wt ? parseFloat(sv.wt) : 0;
+
+      // Calculate % of target
+      let pctClass = 'neutral';
+      let pctText = '—';
+      if(setTarget > 0 && actualWt > 0){
+        const pctVal = Math.round((actualWt / setTarget) * 100);
+        pctText = pctVal + '%';
+        pctClass = pctVal >= 100 ? 'hit' : pctVal >= 90 ? 'neutral' : 'miss';
+      }
+
+      h += `<div class="set-row">`;
+      h += `<div class="set-label">S${s}</div>`;
+      h += `<div class="set-target-wt">${setTarget > 0 ? setTarget+'<span style="font-size:8px;opacity:.5;margin-left:2px">lbs</span>' : '—'}</div>`;
+      h += `<input class="set-input" type="number" inputmode="decimal" placeholder="${setTarget>0?setTarget:'lbs'}" value="${sv.wt||''}" data-eid="${eid}" data-set="${s}" data-target="${setTarget}" onchange="logSet('${eid}',${s},'wt',this.value);updatePctBadge(this)" onfocus="this.select()">`;
+      h += `<input class="set-input" type="number" inputmode="numeric" placeholder="${setReps||'reps'}" value="${sv.reps||''}" onchange="logSet('${eid}',${s},'reps',this.value)" onfocus="this.select()">`;
+      h += `<div class="pct-badge ${pctClass}" data-eid="${eid}" data-set="${s}">${pctText}</div>`;
+      h += `</div>`;
+    }
+    h += `</div>`;
+  }
+
+  h += `</div></div>`;
+  return h;
+}
+
+function toggleEx(el, e){
+  if(e.target.tagName==='INPUT'||e.target.classList.contains('pct-badge')) return;
+  el.classList.toggle('open');
+}
+
+// ═══════════════════════════════════════════════════════════
+// EXERCISE PARSER — extracts sets, reps, percentage from detail string
+// ═══════════════════════════════════════════════════════════
+function parseExercise(detail, name){
+  if(!detail) return {sets:0, reps:0, pct:0, repScheme:[]};
+  const d = detail;
+
+  // ── Wave loading: "10-8-6-5 @ 65-75-80-83%"
+  let m = d.match(/^(\d+[-–]\d+(?:[-–]\d+)*)\s*@\s*(\d+)[-–](\d+)[-–]?(\d+)?[-–]?(\d+)?%/);
+  if(m){
+    const reps = m[1].split(/[-–]/).map(Number);
+    const pcts = [m[2],m[3],m[4],m[5]].filter(Boolean).map(Number);
+    // Use the highest percentage as the working target
+    return {sets:reps.length, reps:0, pct:pcts[pcts.length-1]||pcts[0], repScheme:reps, pctScheme:pcts};
+  }
+
+  // ── "NxN @ NN%" pattern
+  m = d.match(/(\d+)\s*[x×]\s*(\d+)\s*@\s*[+]?(\d+)%/i);
+  if(m){
+    const sets=parseInt(m[1]), reps=parseInt(m[2]), pct=parseInt(m[3]);
+    return {sets, reps, pct, repScheme:Array(sets).fill(reps)};
+  }
+
+  // ── "NxN @ +NNlbs" (weighted pull-ups etc)
+  m = d.match(/(\d+)\s*[x×]\s*(\d+)\s*@\s*[+]?(\d+)\s*lbs/i);
+  if(m){
+    return {sets:parseInt(m[1]), reps:parseInt(m[2]), pct:0, repScheme:Array(parseInt(m[1])).fill(parseInt(m[2])), fixedWt:parseInt(m[3])};
+  }
+
+  // ── "NxN BW" or "NxN bodyweight"
+  m = d.match(/(\d+)\s*[x×]\s*(\d+)\s*(BW|bodyweight)/i);
+  if(m){
+    return {sets:parseInt(m[1]), reps:parseInt(m[2]), pct:0, repScheme:Array(parseInt(m[1])).fill(parseInt(m[2]))};
+  }
+
+  // ── "NxN @ moderate" or "NxN @ heavy" etc (no specific %)
+  m = d.match(/(\d+)\s*[x×]\s*(\d+)/i);
+  if(m){
+    // Try to find a percentage after
+    const pctM = d.match(/(\d+)%/);
+    const pct = pctM ? parseInt(pctM[1]) : 0;
+    const sets=parseInt(m[1]), reps=parseInt(m[2]);
+    return {sets, reps, pct, repScheme:Array(sets).fill(reps)};
+  }
+
+  // ── "DELOAD: 3x5 @ 65%"
+  m = d.match(/(\d+)\s*[x×]\s*(\d+)\s*@\s*(\d+)%/i);
+  if(m){
+    const sets=parseInt(m[1]), reps=parseInt(m[2]), pct=parseInt(m[3]);
+    return {sets, reps, pct, repScheme:Array(sets).fill(reps)};
+  }
+
+  // ── "~5-7 sets to technical max" or "Work to Daily Max"
+  if(/work to/i.test(d)){
+    return {sets:6, reps:1, pct:0, repScheme:[1,1,1,1,1,1]};
+  }
+  m = d.match(/~?(\d+)[-–](\d+)\s*sets/i);
+  if(m){
+    const sets = Math.ceil((parseInt(m[1])+parseInt(m[2]))/2);
+    return {sets, reps:1, pct:0, repScheme:Array(sets).fill(1)};
+  }
+
+  // ── "N attempts"
+  m = d.match(/(\d+)\s*attempt/i);
+  if(m){
+    return {sets:parseInt(m[1]), reps:1, pct:0, repScheme:Array(parseInt(m[1])).fill(1)};
+  }
+
+  // ── Time-based (no sets to log)
+  if(/^\d+\s*min/i.test(d)) return {sets:0, reps:0, pct:0, repScheme:[]};
+  if(/sec/i.test(d) && !/[x×]/i.test(d)) return {sets:0, reps:0, pct:0, repScheme:[]};
+
+  // ── Conditioning patterns: "5×5min", "6×10m", "8×20m", "4×400m", "2×(4×400m)"
+  m = d.match(/(\d+)\s*[x×]\s*(\d+)\s*(min|m\b|sec)/i);
+  if(m){
+    return {sets:parseInt(m[1]), reps:0, pct:0, repScheme:Array(parseInt(m[1])).fill(0), isConditioning:true};
+  }
+
+  // Fallback
+  m = d.match(/^(\d+)\s*[x×]/i);
+  if(m) return {sets:parseInt(m[1]), reps:0, pct:0, repScheme:Array(parseInt(m[1])).fill(0)};
+
+  return {sets:0, reps:0, pct:0, repScheme:[]};
+}
+
+// ═══════════════════════════════════════════════════════════
+// TARGET WEIGHT CALCULATOR — from PRs × prescribed %
+// ═══════════════════════════════════════════════════════════
+const EXERCISE_PR_MAP = {
+  'Power Clean':'Power Clean', 'Front Squat':'Front Squat',
+  'Box Back Squat':'Back Squat', 'Back Squat':'Back Squat',
+  'Back Squat — Work to Daily Max':'Back Squat',
+  'Front Squat — Work to Daily Max':'Front Squat',
+  'Power Clean — Work to Daily Max':'Power Clean',
+  'Snatch — Work to Daily Max':'Snatch',
+  'Back Squat Back-off':'Back Squat',
+  'Front Squat Back-off':'Front Squat',
+  'Power Clean Back-off':'Power Clean',
+  'Snatch Back-off':'Snatch',
+  'BB Hip Thrust':'BB Hip Thrust',
+  'Flat Bench Press':'Bench Press', 'Bench Press':'Bench Press',
+  'Bench Press — 1RM Test':'Bench Press',
+  'Box Back Squat — 1RM Test':'Back Squat',
+  'Front Squat — 1RM Test':'Front Squat',
+  'Power Clean — 1RM Test':'Power Clean',
+  'Snatch — 1RM Test':'Snatch',
+  'Pendlay Row — 1RM Test':'Pendlay Row',
+  'Pendlay Row':'Pendlay Row',
+  'Hang Snatch':'Snatch', 'Snatch':'Snatch',
+  'Weighted Pull-ups':'Weighted Pull-ups',
+  'Bulgarian Split Squat':'Front Squat',
+  'BSS':'Front Squat',
+  'Deficit Reverse Lunge':'Front Squat',
+};
+
+function calcTarget(exName, pct){
+  if(!pct || pct === 0) return 0;
+  const prKey = EXERCISE_PR_MAP[exName];
+  if(!prKey) return 0;
+  const prs = getPRs();
+  const pr1rm = prs[prKey];
+  if(!pr1rm || pr1rm === 0) return 0;
+  return Math.round((pct / 100) * pr1rm / 5) * 5; // Round to nearest 5
+}
+
+// ═══════════════════════════════════════════════════════════
+// LIVE % BADGE UPDATE
+// ═══════════════════════════════════════════════════════════
+function updatePctBadge(input){
+  const eid = input.dataset.eid;
+  const setNum = input.dataset.set;
+  const target = parseFloat(input.dataset.target);
+  const actual = parseFloat(input.value);
+  const badge = document.querySelector(`.pct-badge[data-eid="${eid}"][data-set="${setNum}"]`);
+  if(!badge) return;
+
+  if(target > 0 && actual > 0){
+    const pctVal = Math.round((actual / target) * 100);
+    badge.textContent = pctVal + '%';
+    badge.className = 'pct-badge ' + (pctVal >= 100 ? 'hit' : pctVal >= 90 ? 'neutral' : 'miss');
+  } else {
+    badge.textContent = '—';
+    badge.className = 'pct-badge neutral';
+  }
+}
+
+// ── SET LOG STORAGE ──
+function getSetLog(eid){
+  return load('sets',{})[eid] || {};
+}
+function logSet(eid, setNum, field, val){
+  const all = load('sets',{});
+  if(!all[eid]) all[eid] = {};
+  if(!all[eid][setNum]) all[eid][setNum] = {};
+  all[eid][setNum][field] = val;
+  save('sets', all);
+}
+
+function markComplete(){
+  const done = !isComplete(curWeek, curDay);
+  setCompletion(curWeek, curDay, done);
+  renderAll();
+}
+
+function renderPlan(){
+  const p = document.getElementById('p-plan');
+  let h = '';
+  PHASES.forEach((ph,pi)=>{
+    h += `<div style="margin-bottom:28px;">`;
+    h += `<div class="ph-title">Phase ${pi+1} — ${ph.n}</div>`;
+    h += `<div class="ph-desc">${ph.desc}</div>`;
+    for(let w=ph.wks[0]; w<=ph.wks[1]; w++){
+      const isCur = w===curWeek;
+      const allDone = [0,1,2,3,4,5,6].every(d=>isComplete(w,d));
+      const focus = getPhase(w).n;
+      h += `<div class="pw-row${isCur?' cur':''}" onclick="curWeek=${w};curDay=0;nav('today')">`;
+      h += `<div class="pw-num">Week ${w}</div>`;
+      h += `<div class="pw-focus">${focus} — W${w}</div>`;
+      h += `<div class="pw-status">${allDone?'✓ COMPLETE':isCur?'CURRENT':'—'}</div>`;
+      h += `</div>`;
+    }
+    h += `</div>`;
+  });
+  p.innerHTML = h;
+}
+
+function renderStats(){
+  const p = document.getElementById('p-stats');
+  const prs = getPRs();
+  const targets = {
+    'Back Squat':{cur:335,target:585},'Front Squat':{cur:265,target:405},
+    'Power Clean':{cur:225,target:315},'Snatch':{cur:115,target:185},
+    'Bench Press':{cur:285,target:350},'Pendlay Row':{cur:200,target:315},
+  };
+  const comp = getCompletions();
+  const totalSessions = Object.keys(comp).filter(k=>comp[k]).length;
+  const totalPossible = curWeek * 7;
+
+  let h = `<div class="ph-title" style="margin-bottom:20px;">PROGRAM STATISTICS</div>`;
+  h += `<div class="sg">`;
+  h += `<div class="sc"><div class="sc-l">Sessions Completed</div><div class="sc-v">${totalSessions}</div><div class="sc-s">of ${totalPossible} possible</div></div>`;
+  h += `<div class="sc"><div class="sc-l">Current Week</div><div class="sc-v">${curWeek}</div><div class="sc-s">of 40 weeks</div></div>`;
+  h += `<div class="sc"><div class="sc-l">Phase</div><div class="sc-v">${getPhaseNum(curWeek)}</div><div class="sc-s">${getPhase(curWeek).n}</div></div>`;
+  h += `<div class="sc"><div class="sc-l">Completion Rate</div><div class="sc-v">${totalPossible?Math.round(totalSessions/totalPossible*100):0}%</div><div class="sc-s">consistency tracker</div></div>`;
+  h += `</div>`;
+
+  h += `<div class="ph-title" style="margin-bottom:16px; margin-top:12px;">LIFT PROGRESS VS TARGET</div>`;
+  Object.keys(targets).forEach(lift=>{
+    const t = targets[lift];
+    const curPR = prs[lift] || t.cur;
+    const pct = Math.min(Math.round((curPR-t.cur)/(t.target-t.cur)*100),100);
+    h += `<div class="sc" style="margin-bottom:12px;">`;
+    h += `<div style="display:flex;justify-content:space-between;align-items:center;">`;
+    h += `<div class="sc-l">${lift}</div>`;
+    h += `<div style="font-family:'LEMON MILK',sans-serif;font-size:10px;letter-spacing:1px;color:var(--blue);">${curPR} / ${t.target} lbs</div>`;
+    h += `</div>`;
+    h += `<div class="prog-bar"><div class="prog-fill" style="width:${Math.max(pct,2)}%"></div></div>`;
+    h += `</div>`;
+  });
+
+  p.innerHTML = h;
+}
+
+function renderPRs(){
+  const p = document.getElementById('p-prs');
+  const prs = getPRs();
+  let h = `<div class="pr-title">PERSONAL RECORDS</div>`;
+
+  Object.keys(prs).forEach(lift=>{
+    h += `<div class="pr-row"><div class="pr-name">${lift}</div><div class="pr-val">${prs[lift]} lbs</div></div>`;
+  });
+
+  h += `<div style="margin-top:24px;"><div class="pr-title" style="font-size:9px;">UPDATE A PR</div>`;
+  h += `<div class="pr-form">`;
+  h += `<div class="pr-fg"><label>Exercise</label><select id="prSelect">`;
+  Object.keys(prs).forEach(lift=>{ h += `<option value="${lift}">${lift}</option>`; });
+  h += `</select></div>`;
+  h += `<div class="pr-fg"><label>Weight (lbs)</label><input type="number" id="prWeight" placeholder="0"></div>`;
+  h += `<button class="pr-add" onclick="addPR()">UPDATE PR</button>`;
+  h += `</div></div>`;
+
+  p.innerHTML = h;
+}
+
+function addPR(){
+  const sel = document.getElementById('prSelect');
+  const wt = document.getElementById('prWeight');
+  if(sel && wt && wt.value){
+    setPR(sel.value, parseInt(wt.value));
+    renderPRs();
+    renderStats();
+  }
+}
+
+function renderAll(){
+  const phase = getPhase(curWeek);
+  const pn = getPhaseNum(curWeek);
+  document.getElementById('phaseTag').textContent = `Phase ${pn} · Week ${curWeek}`;
+  document.getElementById('weekLbl').textContent = `Week ${curWeek} / 40`;
+
+  renderDayTabs();
+  renderWorkout();
+  renderPlan();
+  renderStats();
+  renderPRs();
+}
+
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function nav(view){
+  curView = view;
+  document.querySelectorAll('.sb-btn').forEach(b=>b.classList.toggle('on', b.dataset.v===view));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('p-'+view).classList.add('on');
+  if(view==='today') renderWorkout();
+}
+
+function chgWeek(dir){
+  curWeek = Math.min(Math.max(curWeek+dir,1),40);
+  curDay = 0;
+  renderAll();
+}
+
+// ═══════════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════════
+function startApp(){
+  const c = calcCurrentWeek();
+  curWeek = c.week;
+  curDay = c.day;
+  updateClock();
+  setInterval(updateClock, 1000);
+  renderAll();
+}
+</script>
+</body>
+</html>
