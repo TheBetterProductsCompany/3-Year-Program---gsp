@@ -4,431 +4,535 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>THE RELENTLESS 42 AUDIT</title>
-<link rel="preconnect" href="https://fonts.cdnfonts.com">
 <style>
 @import url('https://fonts.cdnfonts.com/css/lemon-milk');
-@import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700&display=swap');
 
 :root {
-  --stone: #F0EDE8;
-  --stone-light: #F5F2ED;
-  --stone-mid: #E6E2DB;
-  --black: #141414;
-  --black-soft: #1C1C1C;
-  --blue: #0B1D33;
-  --blue-mid: #15294A;
-  --blue-accent: #1E3A5F;
-  --blue-light: #2A4D7A;
-  --text-dim: #8A8680;
-  --text-mid: #5C5954;
-  --border: rgba(20,20,20,0.07);
-  --border-dark: rgba(245,242,237,0.08);
-  --green: #2D6A4F;
-  --green-bg: rgba(45,106,79,0.08);
-  --red: #9B2C2C;
-  --red-bg: rgba(155,44,44,0.08);
+  --bg: #000000;
+  --surface: #1C1C1E;
+  --surface-raised: #2C2C2E;
+  --surface-glass: rgba(255,255,255,.05);
+  --glass-border: rgba(255,255,255,.08);
+  --glass-border-strong: rgba(255,255,255,.12);
+  --glass-hover: rgba(255,255,255,.08);
+  --white: #F5F5F7;
+  --text: #F5F5F7;
+  --text-secondary: #A1A1A6;
+  --text-tertiary: #6E6E73;
+  --border: rgba(255,255,255,.06);
+  --border-light: rgba(255,255,255,.04);
+  --green: #30D158;
+  --green-soft: rgba(48,209,88,.12);
+  --red: #FF453A;
+  --red-soft: rgba(255,69,58,.1);
+  --orange: #FF9F0A;
+  --accent: #F5F5F7;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.3);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.3);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,.4);
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-lg: 18px;
+  --radius-xl: 22px;
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
 html { height:100%; }
 body {
-  font-family: 'Satoshi', -apple-system, sans-serif;
-  background: var(--stone);
-  color: var(--black);
-  min-height:100%;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  font-family:'Satoshi',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:var(--bg); color:var(--text);
+  min-height:100%; -webkit-font-smoothing:antialiased;
+  overflow-x:hidden; font-weight:400;
 }
 
-/* ════════════════════════ LOGIN ════════════════════════ */
+/* ════════════ LOGIN ════════════ */
 #login {
   position:fixed; inset:0; z-index:9999;
-  background: var(--blue);
-  display:flex; align-items:center; justify-content:center; flex-direction:column;
-  transition: opacity .5s, transform .5s;
+  background:#000; display:flex; align-items:center;
+  justify-content:center; flex-direction:column;
+  transition:opacity .6s,transform .6s;
 }
-#login.out { opacity:0; pointer-events:none; transform:scale(1.04); }
+#login.out { opacity:0; pointer-events:none; transform:scale(1.02); }
 .l-pre {
-  font-family:'LEMON MILK',sans-serif; font-size:11px; letter-spacing:8px;
-  color:rgba(240,237,232,.25); margin-bottom:48px; text-transform:uppercase;
+  font-family:'LEMON MILK',sans-serif; font-size:10px; letter-spacing:10px;
+  color:rgba(255,255,255,.12); margin-bottom:52px; text-transform:uppercase;
 }
 .l-title {
-  font-family:'LEMON MILK',sans-serif; font-size:clamp(24px,6vw,38px);
-  letter-spacing:5px; color:var(--stone-light); margin-bottom:8px; text-transform:uppercase;
+  font-family:'LEMON MILK',sans-serif; font-size:clamp(28px,8vw,48px);
+  letter-spacing:6px; color:#fff; margin-bottom:10px; text-transform:uppercase;
 }
 .l-sub {
-  font-size:10px; letter-spacing:6px; color:rgba(240,237,232,.2);
-  margin-bottom:44px; text-transform:uppercase;
+  font-size:11px; letter-spacing:7px; color:rgba(255,255,255,.12);
+  margin-bottom:52px; text-transform:uppercase;
 }
 #login input {
-  width:300px; padding:18px 20px; background:rgba(240,237,232,.04);
-  border:1px solid rgba(240,237,232,.1); color:var(--stone-light);
-  font-family:'Satoshi',sans-serif; font-size:14px; letter-spacing:5px;
-  text-align:center; outline:none; transition:border .3s;
+  width:300px; padding:18px 24px;
+  background:rgba(255,255,255,.04); backdrop-filter:blur(40px);
+  -webkit-backdrop-filter:blur(40px);
+  border:1px solid rgba(255,255,255,.08); border-radius:var(--radius);
+  color:#fff; font-family:'Satoshi',sans-serif; font-size:15px;
+  letter-spacing:4px; text-align:center; outline:none;
+  transition:all .3s;
 }
-#login input::placeholder { color:rgba(240,237,232,.15); font-size:11px; letter-spacing:4px; }
-#login input:focus { border-color:rgba(240,237,232,.28); }
+#login input::placeholder { color:rgba(255,255,255,.15); font-size:11px; letter-spacing:5px; }
+#login input:focus { border-color:rgba(255,255,255,.2); background:rgba(255,255,255,.07); }
 .l-btn {
-  margin-top:20px; padding:16px 56px; background:var(--stone-light); color:var(--blue);
-  font-family:'LEMON MILK',sans-serif; font-size:11px; letter-spacing:4px;
-  border:none; cursor:pointer; text-transform:uppercase; transition:all .25s;
+  margin-top:24px; padding:16px 56px;
+  background:#fff; color:#000; border-radius:980px;
+  font-family:'LEMON MILK',sans-serif; font-size:10px; letter-spacing:5px;
+  border:none; cursor:pointer; text-transform:uppercase; transition:all .3s;
 }
-.l-btn:hover { opacity:.88; transform:translateY(-1px); }
+.l-btn:hover { opacity:.85; transform:translateY(-1px); }
 .l-err {
-  margin-top:16px; font-size:10px; letter-spacing:2px; color:#C0392B;
+  margin-top:18px; font-size:11px; letter-spacing:2px; color:var(--red);
   opacity:0; transition:opacity .3s;
 }
 .l-err.on { opacity:1; }
 
-/* ════════════════════════ APP SHELL ════════════════════════ */
+/* ════════════ APP SHELL ════════════ */
 #app { display:none; min-height:100vh; }
-#app.on { display:flex; }
+#app.on { display:block; }
 
-/* ── SIDEBAR ── */
-.sb {
-  width:62px; min-height:100vh; background:var(--blue);
-  display:flex; flex-direction:column; align-items:center;
-  padding:22px 0; position:fixed; left:0; top:0; bottom:0; z-index:100;
-}
-.sb-mark {
-  font-family:'LEMON MILK',sans-serif; font-size:9px; color:rgba(240,237,232,.2);
-  letter-spacing:2px; writing-mode:vertical-rl; transform:rotate(180deg);
-  margin-bottom:36px;
-}
-.sb-nav { display:flex; flex-direction:column; gap:8px; }
-.sb-btn {
-  width:44px; height:44px; display:flex; align-items:center; justify-content:center;
-  background:transparent; border:1px solid transparent; color:rgba(240,237,232,.28);
-  cursor:pointer; transition:all .2s; position:relative; border-radius:0;
-}
-.sb-btn:hover { color:rgba(240,237,232,.6); background:rgba(240,237,232,.03); }
-.sb-btn.on { color:var(--stone-light); background:rgba(240,237,232,.07); border-color:rgba(240,237,232,.08); }
-.sb-btn .tip {
-  position:absolute; left:54px; background:var(--black); color:var(--stone-light);
-  font-size:9px; letter-spacing:2px; padding:6px 12px; white-space:nowrap;
-  opacity:0; pointer-events:none; transition:opacity .2s; text-transform:uppercase;
-}
-.sb-btn:hover .tip { opacity:1; }
-
-/* ── MAIN ── */
-.main { margin-left:62px; flex:1; min-height:100vh; }
-
-/* ── TOP BAR ── */
-.topbar {
-  background:var(--black); padding:16px 28px;
+/* ── TOP STATUS BAR ── */
+.status-bar {
   display:flex; align-items:center; justify-content:space-between;
-  position:sticky; top:0; z-index:50; flex-wrap:wrap; gap:10px;
+  padding:16px 32px; border-bottom:1px solid var(--border);
+  flex-wrap:wrap; gap:10px;
 }
-.tb-left { display:flex; align-items:center; gap:18px; }
+.sb-left { display:flex; align-items:center; gap:16px; }
 .live {
   display:flex; align-items:center; gap:8px;
-  background:rgba(240,237,232,.05); padding:9px 16px; border:1px solid rgba(240,237,232,.06);
+  padding:6px 14px; border-radius:980px;
+  background:rgba(48,209,88,.08); border:1px solid rgba(48,209,88,.15);
 }
 .live-dot {
   width:6px; height:6px; background:var(--green); border-radius:50%;
-  animation:blink 2s infinite;
+  box-shadow:0 0 10px rgba(48,209,88,.5);
+  animation:pulse 2s infinite;
 }
-@keyframes blink { 0%,100%{opacity:1}50%{opacity:.35} }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)} }
 .live span {
-  font-family:'LEMON MILK',sans-serif; font-size:10px; letter-spacing:3px;
-  color:var(--stone-light); text-transform:uppercase;
+  font-family:'LEMON MILK',sans-serif; font-size:9px; letter-spacing:3px;
+  color:var(--green); text-transform:uppercase;
 }
 .phase-tag {
-  font-size:9px; letter-spacing:2px; color:rgba(240,237,232,.4);
-  padding:6px 14px; border:1px solid rgba(240,237,232,.06); text-transform:uppercase;
+  font-size:10px; letter-spacing:2px; color:var(--text-tertiary);
+  padding:6px 14px; border-radius:980px;
+  border:1px solid var(--border); text-transform:uppercase;
 }
-.tb-right { display:flex; align-items:center; gap:18px; }
+.sb-right { display:flex; align-items:center; gap:20px; }
 .clock {
-  font-family:'LEMON MILK',sans-serif; font-size:clamp(16px,3vw,24px);
-  letter-spacing:3px; color:var(--stone-light); font-variant-numeric:tabular-nums;
+  font-family:'LEMON MILK',sans-serif; font-size:clamp(16px,3vw,22px);
+  letter-spacing:3px; color:var(--text); font-variant-numeric:tabular-nums;
+  opacity:.7;
 }
 .date-display {
-  font-size:10px; letter-spacing:3px; color:rgba(240,237,232,.4); text-transform:uppercase;
+  font-size:10px; letter-spacing:3px; color:var(--text-tertiary); text-transform:uppercase;
+}
+
+/* ── TOP NAV TABS ── */
+.top-nav {
+  display:flex; align-items:center; justify-content:center;
+  padding:12px 32px; gap:4px;
+  border-bottom:1px solid var(--border);
+  background:rgba(0,0,0,.5); backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  position:sticky; top:0; z-index:50;
+}
+.nav-tab {
+  padding:10px 24px; font-family:'LEMON MILK',sans-serif; font-size:10px;
+  letter-spacing:3px; color:var(--text-tertiary); cursor:pointer;
+  border:none; border-radius:980px; background:transparent;
+  text-transform:uppercase; transition:all .25s; white-space:nowrap;
+}
+.nav-tab:hover { color:var(--text-secondary); background:var(--surface-glass); }
+.nav-tab.on {
+  color:var(--text); background:var(--surface);
 }
 
 /* ── WEEK NAV ── */
 .weeknav {
-  display:flex; align-items:center; gap:12px; padding:14px 28px;
-  background:var(--stone); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  gap:16px; padding:16px 32px;
+  border-bottom:1px solid var(--border);
 }
 .wn-btn {
-  width:34px; height:34px; display:flex; align-items:center; justify-content:center;
-  background:transparent; border:1px solid var(--border); color:var(--text-dim);
-  cursor:pointer; font-size:16px; transition:all .2s;
+  width:36px; height:36px; display:flex; align-items:center; justify-content:center;
+  background:var(--surface); border:none; border-radius:50%;
+  color:var(--text-secondary); cursor:pointer; font-size:16px;
+  transition:all .2s;
 }
-.wn-btn:hover { border-color:var(--blue); color:var(--blue); }
+.wn-btn:hover { background:var(--surface-raised); color:var(--text); }
 .wn-label {
   font-family:'LEMON MILK',sans-serif; font-size:12px; letter-spacing:3px;
-  color:var(--blue); text-transform:uppercase;
+  color:var(--text); text-transform:uppercase;
 }
 
 /* ── DAY TABS ── */
 .dtabs {
-  display:flex; background:var(--stone-mid); border-bottom:1px solid var(--border);
-  overflow-x:auto; padding:0 28px;
+  display:flex; justify-content:center;
+  padding:10px 20px; gap:4px;
+  border-bottom:1px solid var(--border);
 }
 .dtab {
-  padding:15px 18px; font-family:'LEMON MILK',sans-serif; font-size:10px;
-  letter-spacing:3px; color:var(--text-dim); cursor:pointer;
-  border:none; border-bottom:2px solid transparent; background:transparent;
-  text-transform:uppercase; transition:all .2s; white-space:nowrap;
+  padding:8px 14px; font-family:'LEMON MILK',sans-serif; font-size:10px;
+  letter-spacing:2px; color:var(--text-tertiary); cursor:pointer;
+  border:none; border-radius:var(--radius-sm); background:transparent;
+  text-transform:uppercase; transition:all .25s; white-space:nowrap;
 }
-.dtab:hover { color:var(--black); }
-.dtab.on { color:var(--blue); border-bottom-color:var(--blue); }
-.dtab.done::after { content:'✓'; margin-left:6px; font-size:9px; color:var(--green); }
+.dtab:hover { color:var(--text-secondary); background:var(--surface-glass); }
+.dtab.on { color:var(--text); background:var(--surface); }
+.dtab.done::after { content:'✓'; margin-left:5px; font-size:9px; color:var(--green); }
 
-/* ── CONTENT PANELS ── */
-.panel { display:none; padding:32px; max-width:960px; }
+/* ── CONTENT ── */
+.panel { display:none; padding:36px 32px; max-width:960px; margin:0 auto; }
 .panel.on { display:block; }
 
 /* ── DAY HEADER ── */
 .dh-code {
   font-family:'LEMON MILK',sans-serif; font-size:clamp(20px,4vw,28px);
-  letter-spacing:4px; color:var(--blue); margin-bottom:18px; text-transform:uppercase;
+  letter-spacing:5px; color:var(--text); margin-bottom:24px; text-transform:uppercase;
 }
-.dh-meta { display:flex; gap:24px; flex-wrap:wrap; margin-bottom:32px; }
-.dh-m { display:flex; flex-direction:column; gap:4px; }
+.dh-meta { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:40px; }
+.dh-m {
+  padding:14px 20px; background:var(--surface-glass);
+  border:1px solid var(--glass-border); border-radius:var(--radius);
+  backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+}
 .dh-m-l {
-  font-size:9px; letter-spacing:3px; color:var(--text-dim); text-transform:uppercase;
+  font-size:9px; letter-spacing:3px; color:var(--text-tertiary);
+  text-transform:uppercase; margin-bottom:4px;
 }
 .dh-m-v {
-  font-family:'LEMON MILK',sans-serif; font-size:12px; letter-spacing:2px;
-  color:var(--black); text-transform:uppercase;
+  font-family:'LEMON MILK',sans-serif; font-size:12px; letter-spacing:1px; color:var(--text);
 }
 
 /* ── SECTIONS ── */
-.sec { margin-bottom:28px; }
+.sec { margin-bottom:32px; }
 .sec-h {
-  font-family:'LEMON MILK',sans-serif; font-size:11px; letter-spacing:4px;
-  color:var(--blue); padding:12px 0; border-bottom:1px solid var(--border);
-  margin-bottom:16px; text-transform:uppercase;
+  font-family:'LEMON MILK',sans-serif; font-size:11px; letter-spacing:5px;
+  color:var(--text-secondary); padding:16px 0 12px;
+  margin-bottom:12px; text-transform:uppercase;
 }
 
-/* ── EXERCISE ITEMS ── */
+/* ══════════ GLASS EXERCISE CARDS ══════════ */
 .ex {
-  display:flex; align-items:flex-start; padding:14px 0;
-  border-bottom:1px solid rgba(20,20,20,.04);
-  cursor:pointer; transition:background .15s;
+  display:flex; align-items:flex-start; padding:18px 20px;
+  margin-bottom:8px;
+  background:var(--surface-glass);
+  border:1px solid var(--glass-border);
+  border-radius:var(--radius);
+  backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+  cursor:pointer; transition:all .3s ease;
 }
-.ex:hover { background:rgba(11,29,51,.015); }
-.ex.open { background:rgba(11,29,51,.025); cursor:default; padding:14px 12px; margin:0 -12px; }
+.ex:hover {
+  border-color:var(--glass-border-strong);
+  background:var(--glass-hover);
+}
+.ex.open {
+  border-color:rgba(255,255,255,.15);
+  background:rgba(255,255,255,.07);
+  cursor:default;
+}
 .ex-dot {
-  width:6px; height:6px; background:var(--blue); border-radius:50%;
-  margin-top:8px; margin-right:16px; flex-shrink:0; opacity:.35;
+  width:8px; height:8px; border:1.5px solid var(--text-tertiary);
+  border-radius:50%; margin-top:6px; margin-right:16px; flex-shrink:0;
 }
+.ex.open .ex-dot { background:var(--text); border-color:var(--text); }
 .ex-body { flex:1; }
-.ex-name {
-  font-size:13px; letter-spacing:.8px; color:var(--black); margin-bottom:4px;
-  font-weight:normal;
-}
-.ex-detail { font-size:12px; color:var(--text-dim); letter-spacing:.4px; }
-.ex-note {
-  font-size:10.5px; color:var(--text-mid); margin-top:4px;
-  font-style:italic; letter-spacing:.2px;
-}
-
-/* ── TAP TOGGLE ── */
+.ex-name { font-size:14px; font-weight:500; color:var(--text); margin-bottom:4px; }
+.ex-detail { font-size:13px; color:var(--text-secondary); }
+.ex-note { font-size:11px; color:var(--text-tertiary); margin-top:5px; font-style:italic; }
 .ex-toggle {
-  font-size:8px; letter-spacing:3px; color:var(--blue); opacity:.3;
-  margin-top:6px; text-transform:uppercase; transition:opacity .2s;
+  font-size:9px; letter-spacing:3px; color:var(--text-tertiary); opacity:.4;
+  margin-top:8px; text-transform:uppercase; transition:opacity .2s;
 }
-.ex:hover .ex-toggle { opacity:.6; }
+.ex:hover .ex-toggle { opacity:.7; }
 .ex.open .ex-toggle { display:none; }
 
-/* ── EXPANDABLE SET ROWS ── */
+/* ── SET ROWS ── */
 .ex-sets {
-  display:none; margin-top:12px; padding-top:10px;
-  border-top:1px solid rgba(11,29,51,.07);
+  display:none; margin-top:14px; padding-top:12px;
+  border-top:1px solid var(--border);
 }
 .ex.open .ex-sets { display:block; }
 
 .sets-hdr {
-  display:grid; grid-template-columns:36px 1fr 1fr 1fr 50px 40px; gap:6px;
-  margin-bottom:10px; padding-bottom:7px; align-items:center;
-  border-bottom:1px dashed rgba(11,29,51,.06);
+  display:grid; grid-template-columns:36px 1fr 1fr 1fr 48px 40px; gap:8px;
+  margin-bottom:10px; padding-bottom:8px; align-items:center;
+  border-bottom:1px solid var(--border-light);
 }
 .sets-hdr span {
-  font-size:8px; letter-spacing:2.5px; color:var(--text-dim); text-transform:uppercase;
+  font-size:9px; letter-spacing:2px; color:var(--text-tertiary); text-transform:uppercase;
 }
 .sets-hdr .sh-c { text-align:center; }
 
 .set-row {
-  display:grid; grid-template-columns:36px 1fr 1fr 1fr 50px 40px; gap:6px;
+  display:grid; grid-template-columns:36px 1fr 1fr 1fr 48px 40px; gap:8px;
   margin-bottom:8px; align-items:center;
 }
 .set-label {
-  font-family:'LEMON MILK',sans-serif; font-size:9px; letter-spacing:2px;
-  color:var(--blue); text-transform:uppercase; opacity:.6;
+  font-family:'LEMON MILK',sans-serif; font-size:10px; letter-spacing:1px;
+  color:var(--text-tertiary);
 }
 .set-target-wt {
-  font-family:'LEMON MILK',sans-serif; font-size:11px; letter-spacing:1px;
-  color:var(--blue); opacity:.5; text-align:center; padding:9px 6px;
-  background:rgba(11,29,51,.04); border:1px dashed rgba(11,29,51,.08);
+  font-family:'LEMON MILK',sans-serif; font-size:12px; letter-spacing:1px;
+  color:var(--text); opacity:.3; text-align:center; padding:10px 6px;
+  background:var(--surface-glass); border:1px solid var(--border);
+  border-radius:var(--radius-sm);
 }
 .set-input {
-  width:100%; padding:10px 8px;
-  background:var(--stone-light); border:1px solid var(--border);
-  font-family:'Satoshi',sans-serif; font-size:12px;
-  color:var(--black); outline:none; text-align:center;
-  transition:border .2s;
+  width:100%; padding:11px 10px;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  font-family:'Satoshi',sans-serif; font-size:13px;
+  color:var(--text); outline:none; text-align:center; transition:all .2s;
 }
-.set-input:focus { border-color:var(--blue); background:white; }
-.set-input::placeholder { color:rgba(138,134,128,.4); font-size:10px; }
+.set-input:focus { border-color:rgba(255,255,255,.2); box-shadow:0 0 0 3px rgba(255,255,255,.04); }
+.set-input::placeholder { color:var(--text-tertiary); font-size:11px; }
 
-/* ── % BADGE ── */
 .pct-badge {
   display:flex; align-items:center; justify-content:center;
-  font-family:'LEMON MILK',sans-serif; font-size:10px; letter-spacing:1px;
-  padding:8px 4px; text-align:center; min-width:52px;
-  transition:all .3s;
+  font-family:'LEMON MILK',sans-serif; font-size:10px; letter-spacing:.5px;
+  padding:8px 4px; text-align:center; border-radius:var(--radius-sm); transition:all .3s;
 }
-.pct-badge.hit { background:var(--green-bg); color:var(--green); }
-.pct-badge.miss { background:var(--red-bg); color:var(--red); }
-.pct-badge.neutral { background:rgba(11,29,51,.03); color:var(--text-dim); }
+.pct-badge.hit { background:var(--green-soft); color:var(--green); }
+.pct-badge.miss { background:var(--red-soft); color:var(--red); }
+.pct-badge.neutral { background:var(--surface-glass); color:var(--text-tertiary); }
 
-/* ── SET CONFIRM BUTTON ── */
 .set-confirm {
   width:36px; height:36px; display:flex; align-items:center; justify-content:center;
-  background:transparent; border:1.5px solid var(--border);
-  color:var(--text-dim); cursor:pointer; transition:all .25s; font-size:14px;
-  flex-shrink:0;
+  background:var(--surface); border:none; border-radius:50%;
+  color:var(--text-tertiary); cursor:pointer; transition:all .25s; font-size:14px;
 }
-.set-confirm:hover { border-color:var(--blue); color:var(--blue); }
-.set-confirm.saved {
-  background:var(--green); border-color:var(--green); color:white;
-  animation:confirmPop .3s ease;
-}
-.set-confirm.failed {
-  background:var(--red); border-color:var(--red); color:white;
-}
-.set-confirm.saving {
-  opacity:.5; pointer-events:none;
-}
-@keyframes confirmPop {
-  0%{transform:scale(1)} 50%{transform:scale(1.15)} 100%{transform:scale(1)}
-}
+.set-confirm:hover { background:var(--surface-raised); color:var(--text); }
+.set-confirm.saved { background:var(--green); color:#000; animation:confirmPop .3s; }
+.set-confirm.failed { background:var(--red); color:#fff; }
+.set-confirm.saving { opacity:.3; pointer-events:none; }
+@keyframes confirmPop { 0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)} }
 
-/* ── SESSION NOTES ── */
+/* ── NOTES ── */
 .notes {
-  margin-top:32px; padding:20px; background:rgba(11,29,51,.03);
-  border:1px solid rgba(11,29,51,.05);
+  margin-top:36px; padding:22px;
+  background:var(--surface-glass); border:1px solid var(--glass-border);
+  border-radius:var(--radius); backdrop-filter:blur(20px);
 }
 .notes-h {
   font-family:'LEMON MILK',sans-serif; font-size:10px; letter-spacing:3px;
-  color:var(--blue); margin-bottom:12px; text-transform:uppercase;
+  color:var(--text-secondary); margin-bottom:14px; text-transform:uppercase;
 }
 .notes textarea {
-  width:100%; min-height:80px; background:transparent; border:none;
-  font-family:'Satoshi',sans-serif; font-size:12px; color:var(--black);
+  width:100%; min-height:80px; background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius-sm); padding:14px;
+  font-family:'Satoshi',sans-serif; font-size:13px; color:var(--text);
   resize:vertical; outline:none; line-height:1.7;
 }
-.notes textarea::placeholder { color:var(--text-dim); font-size:11px; }
+.notes textarea:focus { border-color:rgba(255,255,255,.15); }
+.notes textarea::placeholder { color:var(--text-tertiary); }
 
-/* ── COMPLETE BTN ── */
+/* ── COMPLETE ── */
 .comp-btn {
-  margin-top:24px; width:100%; padding:20px;
-  background:var(--blue); color:var(--stone-light);
+  margin-top:28px; width:100%; padding:18px;
+  background:var(--white); color:var(--bg); border-radius:var(--radius);
   font-family:'LEMON MILK',sans-serif; font-size:11px; letter-spacing:4px;
-  border:none; cursor:pointer; text-transform:uppercase; transition:all .25s;
+  border:none; cursor:pointer; text-transform:uppercase; transition:all .3s;
 }
-.comp-btn:hover { background:var(--blue-mid); transform:translateY(-1px); }
-.comp-btn.done { background:var(--green); cursor:default; }
-.comp-btn.done:hover { transform:none; }
+.comp-btn:hover { opacity:.85; transform:translateY(-1px); }
+.comp-btn.done { background:var(--green); color:#000; }
+.comp-btn.done:hover { transform:none; opacity:1; }
 
-/* ── PLAN VIEW ── */
+/* ── PLAN ── */
 .ph-title {
-  font-family:'LEMON MILK',sans-serif; font-size:15px; letter-spacing:4px;
-  color:var(--blue); margin-bottom:8px; text-transform:uppercase;
+  font-family:'LEMON MILK',sans-serif; font-size:16px; letter-spacing:4px;
+  color:var(--text); margin-bottom:8px; text-transform:uppercase;
 }
-.ph-desc {
-  font-size:11px; color:var(--text-dim); letter-spacing:1px; margin-bottom:22px;
-}
+.ph-desc { font-size:13px; color:var(--text-secondary); margin-bottom:22px; line-height:1.5; }
 .pw-row {
-  display:flex; align-items:center; padding:14px 16px;
-  border-bottom:1px solid var(--border); cursor:pointer; transition:background .2s;
+  display:flex; align-items:center; padding:16px 20px; margin-bottom:6px;
+  background:var(--surface-glass); border:1px solid var(--glass-border);
+  border-radius:var(--radius-sm); cursor:pointer; transition:all .2s;
 }
-.pw-row:hover { background:rgba(11,29,51,.02); }
-.pw-row.cur { background:rgba(11,29,51,.04); border-left:3px solid var(--blue); }
+.pw-row:hover { border-color:var(--glass-border-strong); }
+.pw-row.cur { border-color:var(--text); background:rgba(255,255,255,.07); }
 .pw-num {
   font-family:'LEMON MILK',sans-serif; font-size:11px; letter-spacing:2px;
-  color:var(--blue); width:80px; text-transform:uppercase;
+  color:var(--text); width:80px; text-transform:uppercase;
 }
-.pw-focus { font-size:11px; color:var(--text-mid); flex:1; }
-.pw-status { font-size:9px; letter-spacing:2px; color:var(--text-dim); text-transform:uppercase; }
+.pw-focus { font-size:12px; color:var(--text-secondary); flex:1; }
+.pw-status { font-size:10px; color:var(--text-tertiary); }
 
-/* ── STATS VIEW ── */
-.sg { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:22px; }
+/* ── STATS ── */
+.sg { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px; }
 .sc {
-  background:rgba(11,29,51,.03); border:1px solid rgba(11,29,51,.05); padding:20px;
+  background:var(--surface-glass); border:1px solid var(--glass-border);
+  border-radius:var(--radius); padding:22px; backdrop-filter:blur(20px);
 }
-.sc-l {
-  font-size:9px; letter-spacing:3px; color:var(--text-dim);
-  text-transform:uppercase; margin-bottom:8px;
-}
-.sc-v {
-  font-family:'LEMON MILK',sans-serif; font-size:clamp(24px,4vw,32px);
-  letter-spacing:2px; color:var(--blue);
-}
-.sc-s { font-size:10px; color:var(--text-dim); margin-top:4px; }
-.prog-bar {
-  width:100%; height:5px; background:var(--stone-mid); margin-top:10px; overflow:hidden;
-}
-.prog-fill { height:100%; background:var(--blue); transition:width .5s; }
+.sc-l { font-size:9px; letter-spacing:3px; color:var(--text-tertiary); text-transform:uppercase; margin-bottom:8px; }
+.sc-v { font-family:'LEMON MILK',sans-serif; font-size:clamp(24px,4vw,32px); letter-spacing:2px; color:var(--text); }
+.sc-s { font-size:11px; color:var(--text-tertiary); margin-top:4px; }
+.prog-bar { width:100%; height:3px; background:var(--surface-raised); border-radius:2px; margin-top:12px; overflow:hidden; }
+.prog-fill { height:100%; background:var(--white); border-radius:2px; transition:width .5s; }
 
-/* ── PRs VIEW ── */
+/* ── PRs ── */
 .pr-title {
-  font-family:'LEMON MILK',sans-serif; font-size:13px; letter-spacing:3px;
-  color:var(--blue); margin-bottom:16px; text-transform:uppercase;
+  font-family:'LEMON MILK',sans-serif; font-size:14px; letter-spacing:3px;
+  color:var(--text); margin-bottom:18px; text-transform:uppercase;
 }
 .pr-row {
   display:flex; justify-content:space-between; align-items:center;
-  padding:14px 0; border-bottom:1px solid var(--border);
+  padding:16px 20px; margin-bottom:6px;
+  background:var(--surface-glass); border:1px solid var(--glass-border);
+  border-radius:var(--radius-sm);
 }
-.pr-name { font-size:12px; color:var(--black); }
-.pr-val {
-  font-family:'LEMON MILK',sans-serif; font-size:13px; letter-spacing:1px; color:var(--blue);
-}
-.pr-form { display:flex; gap:12px; margin-top:20px; align-items:flex-end; flex-wrap:wrap; }
-.pr-fg { display:flex; flex-direction:column; gap:4px; }
-.pr-fg label {
-  font-size:9px; letter-spacing:2px; color:var(--text-dim); text-transform:uppercase;
-}
+.pr-name { font-size:13px; font-weight:500; color:var(--text); }
+.pr-val { font-family:'LEMON MILK',sans-serif; font-size:14px; letter-spacing:1px; color:var(--text); opacity:.7; }
+.pr-form { display:flex; gap:12px; margin-top:24px; align-items:flex-end; flex-wrap:wrap; }
+.pr-fg { display:flex; flex-direction:column; gap:5px; }
+.pr-fg label { font-size:10px; letter-spacing:2px; color:var(--text-tertiary); text-transform:uppercase; }
 .pr-fg input {
-  padding:11px 14px; border:1px solid var(--border); background:var(--stone-light);
-  font-family:'Satoshi',sans-serif; font-size:12px; color:var(--black);
-  outline:none; width:160px;
+  padding:12px 16px; border:1px solid var(--border); background:var(--surface);
+  border-radius:var(--radius-sm); font-family:'Satoshi',sans-serif; font-size:13px;
+  color:var(--text); outline:none; width:160px;
 }
-.pr-fg input:focus { border-color:var(--blue); }
+.pr-fg input:focus { border-color:rgba(255,255,255,.15); }
 .pr-fg select {
-  padding:11px 14px; border:1px solid var(--border); background:var(--stone-light);
-  font-family:'Satoshi',sans-serif; font-size:12px; color:var(--black);
-  outline:none; width:200px;
+  padding:12px 16px; border:1px solid var(--border); background:var(--surface);
+  border-radius:var(--radius-sm); font-family:'Satoshi',sans-serif; font-size:13px;
+  color:var(--text); outline:none; width:200px;
 }
 .pr-add {
-  padding:11px 22px; background:var(--blue); color:var(--stone-light);
+  padding:12px 24px; background:var(--white); color:#000; border-radius:980px;
   font-family:'LEMON MILK',sans-serif; font-size:9px; letter-spacing:2px;
-  border:none; cursor:pointer; text-transform:uppercase;
+  border:none; cursor:pointer; text-transform:uppercase; transition:all .2s;
 }
+.pr-add:hover { opacity:.85; }
+
+/* ══════════ NUTRITION ══════════ */
+.nut-hero { text-align:center; margin-bottom:36px; }
+.nut-hero-title {
+  font-family:'LEMON MILK',sans-serif; font-size:clamp(20px,4vw,28px);
+  letter-spacing:5px; color:var(--text); text-transform:uppercase; margin-bottom:8px;
+}
+.nut-hero-sub { font-size:13px; color:var(--text-secondary); }
+
+.nut-summary {
+  display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px;
+  margin-bottom:36px; padding:26px 20px;
+  background:var(--surface-glass); border:1px solid var(--glass-border);
+  border-radius:var(--radius-lg); backdrop-filter:blur(20px);
+}
+.nut-macro { display:flex; flex-direction:column; align-items:center; gap:3px; }
+.nut-macro-label { font-size:9px; letter-spacing:2px; color:var(--text-tertiary); text-transform:uppercase; }
+.nut-macro-val { font-family:'LEMON MILK',sans-serif; font-size:18px; letter-spacing:1px; color:var(--text); }
+.nut-macro-target { font-size:10px; color:var(--text-tertiary); }
+.nut-macro-bar { width:100%; height:3px; background:var(--surface-raised); border-radius:2px; margin-top:6px; overflow:hidden; }
+.nut-macro-fill { height:100%; border-radius:2px; transition:width .5s; }
+.nut-macro-fill.on-track { background:var(--green); }
+.nut-macro-fill.under { background:var(--white); opacity:.4; }
+.nut-macro-fill.over { background:var(--orange); }
+
+.meal-block {
+  margin-bottom:8px; background:var(--surface-glass);
+  border:1px solid var(--glass-border); border-radius:var(--radius);
+  overflow:hidden; transition:all .25s; backdrop-filter:blur(20px);
+}
+.meal-block.open { border-color:var(--glass-border-strong); background:rgba(255,255,255,.07); }
+.meal-header {
+  display:flex; align-items:center; padding:16px 20px;
+  cursor:pointer; gap:12px; transition:background .2s;
+}
+.meal-header:hover { background:rgba(255,255,255,.02); }
+.meal-time {
+  font-family:'LEMON MILK',sans-serif; font-size:9px; letter-spacing:2px;
+  color:var(--text-tertiary); text-transform:uppercase; width:60px; flex-shrink:0;
+}
+.meal-name { font-size:13px; font-weight:500; color:var(--text); flex:1; }
+.meal-macros-preview { font-size:10px; color:var(--text-tertiary); }
+.meal-confirm {
+  width:30px; height:30px; display:flex; align-items:center; justify-content:center;
+  background:var(--surface); border:none; border-radius:50%;
+  color:var(--text-tertiary); cursor:pointer; transition:all .25s; font-size:12px;
+}
+.meal-confirm.done { background:var(--green); color:#000; }
+.meal-body { padding:0 20px 18px; display:none; }
+.meal-block.open .meal-body { display:block; }
+.meal-items { font-size:13px; color:var(--text-secondary); line-height:1.8; margin-bottom:12px; }
+.meal-why {
+  font-size:11px; color:var(--text-tertiary); line-height:1.6;
+  padding:12px 14px; background:var(--surface); border-radius:var(--radius-sm);
+}
+.meal-locked { font-size:9px; letter-spacing:2px; color:var(--text-tertiary); opacity:.4; text-transform:uppercase; margin-top:10px; }
+.meal-override { margin-top:12px; }
+.meal-override-btn {
+  font-size:10px; color:var(--text-tertiary); opacity:.5; cursor:pointer;
+  background:none; border:none; padding:4px 0; transition:opacity .2s;
+}
+.meal-override-btn:hover { opacity:.8; }
+.meal-override-inputs { display:none; margin-top:10px; }
+.meal-override-inputs.show { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.meal-ov-input {
+  padding:10px; border:1px solid var(--border); background:var(--surface);
+  border-radius:var(--radius-sm); font-family:'Satoshi',sans-serif; font-size:12px;
+  color:var(--text); outline:none; text-align:center;
+}
+.meal-ov-label { font-size:8px; letter-spacing:2px; color:var(--text-tertiary); text-transform:uppercase; text-align:center; margin-bottom:4px; }
+
+.supp-block {
+  margin-top:28px; padding:22px;
+  background:var(--surface-glass); border:1px solid var(--glass-border);
+  border-radius:var(--radius-lg); backdrop-filter:blur(20px);
+}
+.supp-title {
+  font-family:'LEMON MILK',sans-serif; font-size:11px; letter-spacing:3px;
+  color:var(--text-secondary); margin-bottom:16px; text-transform:uppercase;
+}
+.supp-row { display:flex; align-items:center; padding:12px 0; border-bottom:1px solid var(--border-light); gap:12px; }
+.supp-row:last-child { border-bottom:none; }
+.supp-time { font-family:'LEMON MILK',sans-serif; font-size:8px; letter-spacing:2px; color:var(--text-tertiary); width:60px; text-transform:uppercase; flex-shrink:0; }
+.supp-name { font-size:12px; font-weight:500; color:var(--text); flex:1; }
+.supp-why { font-size:11px; color:var(--text-tertiary); flex:1.2; }
+.supp-check {
+  width:26px; height:26px; display:flex; align-items:center; justify-content:center;
+  background:var(--surface); border:none; border-radius:50%;
+  color:transparent; cursor:pointer; transition:all .25s; font-size:12px;
+}
+.supp-check.done { background:var(--green); color:#000; }
+
+.hydration-card {
+  margin-top:20px; padding:20px;
+  background:var(--surface-glass); border:1px solid var(--glass-border);
+  border-radius:var(--radius); backdrop-filter:blur(20px);
+}
+.hydration-title { font-family:'LEMON MILK',sans-serif; font-size:10px; letter-spacing:3px; color:var(--text-secondary); text-transform:uppercase; margin-bottom:8px; }
+.hydration-text { font-size:13px; color:var(--text); }
+.hydration-note { font-size:11px; color:var(--text-tertiary); margin-top:6px; font-style:italic; }
 
 /* ── RESPONSIVE ── */
 @media(max-width:768px){
-  .sb{width:50px;} .main{margin-left:50px;}
-  .topbar{padding:12px 14px;} .dtabs{padding:0 10px;}
-  .dtab{padding:12px 12px;font-size:9px;letter-spacing:2px;}
-  .panel{padding:22px 14px;}
+  .status-bar{padding:12px 16px;}
+  .top-nav{padding:8px 12px; gap:2px;}
+  .nav-tab{padding:8px 14px; font-size:9px; letter-spacing:2px;}
+  .dtabs{padding:6px 10px; gap:2px;}
+  .dtab{padding:7px 10px; font-size:9px; letter-spacing:1px;}
+  .panel{padding:24px 16px;}
   .sg{grid-template-columns:1fr;}
   .pr-form{flex-direction:column;}
   .pr-fg input,.pr-fg select{width:100%;}
-  .weeknav{padding:12px 14px;}
-  .set-row{grid-template-columns:30px 1fr 1fr 1fr 42px 34px;}
-  .sets-hdr{grid-template-columns:30px 1fr 1fr 1fr 42px 34px;}
-  .sb-btn .tip{display:none;}
+  .weeknav{padding:12px 16px;}
+  .set-row{grid-template-columns:30px 1fr 1fr 1fr 40px 34px;}
+  .sets-hdr{grid-template-columns:30px 1fr 1fr 1fr 40px 34px;}
+  .nut-summary{grid-template-columns:1fr 1fr; gap:14px;}
+  .dh-meta{gap:8px;}
+  .dh-m{padding:10px 14px;}
+  .supp-why{display:none;}
+  .meal-macros-preview{display:none;}
 }
 </style>
 </head>
 <body>
 
-<!-- ═══ LOGIN ═══ -->
+<!-- LOGIN -->
 <div id="login">
   <div class="l-pre">AUDIT SYSTEM</div>
   <div class="l-title">RELENTLESS 42</div>
@@ -438,60 +542,45 @@ body {
   <div class="l-err" id="lerr">INCORRECT ACCESS CODE</div>
 </div>
 
-<!-- ═══ APP ═══ -->
+<!-- APP -->
 <div id="app">
-  <!-- Sidebar -->
-  <div class="sb">
-    <div class="sb-mark">R42</div>
-    <div class="sb-nav">
-      <button class="sb-btn on" onclick="nav('today')" data-v="today">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="7"/><polyline points="8 4 8 8 11 9.5"/></svg>
-        <span class="tip">Today</span>
-      </button>
-      <button class="sb-btn" onclick="nav('plan')" data-v="plan">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="14" height="14"/><line x1="1" y1="6" x2="15" y2="6"/><line x1="6" y1="1" x2="6" y2="15"/></svg>
-        <span class="tip">Plan</span>
-      </button>
-      <button class="sb-btn" onclick="nav('stats')" data-v="stats">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 14V7M8 14V3M3 14v-4"/></svg>
-        <span class="tip">Stats</span>
-      </button>
-      <button class="sb-btn" onclick="nav('prs')" data-v="prs">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="8 1 10 5.5 15 6.2 11.5 9.5 12.3 14.5 8 12.2 3.7 14.5 4.5 9.5 1 6.2 6 5.5"/></svg>
-        <span class="tip">PRs</span>
-      </button>
+  <!-- Status Bar (above nav) -->
+  <div class="status-bar">
+    <div class="sb-left">
+      <div class="live"><div class="live-dot"></div><span>Live Session</span></div>
+      <div class="phase-tag" id="phaseTag">Phase 1 · Week 1</div>
+    </div>
+    <div class="sb-right">
+      <div class="clock" id="clock">00:00:00</div>
+      <div class="date-display" id="dateDisp">MON 09 - MAR - 2026</div>
     </div>
   </div>
 
-  <div class="main">
-    <!-- Top Bar -->
-    <div class="topbar">
-      <div class="tb-left">
-        <div class="live"><div class="live-dot"></div><span>Live Session</span></div>
-        <div class="phase-tag" id="phaseTag">Phase 1 · Week 1</div>
-      </div>
-      <div class="tb-right">
-        <div class="clock" id="clock">00:00:00</div>
-        <div class="date-display" id="dateDisp">MON 09 - MAR - 2026</div>
-      </div>
-    </div>
-
-    <!-- Week Nav -->
-    <div class="weeknav">
-      <button class="wn-btn" onclick="chgWeek(-1)">‹</button>
-      <span class="wn-label" id="weekLbl">Week 1 / 40</span>
-      <button class="wn-btn" onclick="chgWeek(1)">›</button>
-    </div>
-
-    <!-- Day Tabs -->
-    <div class="dtabs" id="dtabs"></div>
-
-    <!-- Panels -->
-    <div class="panel on" id="p-today"></div>
-    <div class="panel" id="p-plan"></div>
-    <div class="panel" id="p-stats"></div>
-    <div class="panel" id="p-prs"></div>
+  <!-- Top Navigation -->
+  <div class="top-nav">
+    <button class="nav-tab on" onclick="nav('today')" data-v="today">Today</button>
+    <button class="nav-tab" onclick="nav('nutrition')" data-v="nutrition">Nutrition</button>
+    <button class="nav-tab" onclick="nav('plan')" data-v="plan">Plan</button>
+    <button class="nav-tab" onclick="nav('stats')" data-v="stats">Stats</button>
+    <button class="nav-tab" onclick="nav('prs')" data-v="prs">PRs</button>
   </div>
+
+  <!-- Week Nav -->
+  <div class="weeknav">
+    <button class="wn-btn" onclick="chgWeek(-1)">‹</button>
+    <span class="wn-label" id="weekLbl">Week 1 / 40</span>
+    <button class="wn-btn" onclick="chgWeek(1)">›</button>
+  </div>
+
+  <!-- Day Tabs -->
+  <div class="dtabs" id="dtabs"></div>
+
+  <!-- Panels -->
+  <div class="panel on" id="p-today"></div>
+  <div class="panel" id="p-nutrition"></div>
+  <div class="panel" id="p-plan"></div>
+  <div class="panel" id="p-stats"></div>
+  <div class="panel" id="p-prs"></div>
 </div>
 
 <script>
@@ -1338,6 +1427,20 @@ async function loadFromSupabase(){
     });
   }
   save('sets', _sets);
+
+  // Load nutrition checks
+  const nutData = await sb('nutrition_checks?select=check_key,checked');
+  if(nutData && nutData.length){
+    nutData.forEach(r=>{
+      if(r.check_key.includes('_supp_')){
+        if(r.checked) _suppChecks[r.check_key] = true;
+      } else {
+        if(r.checked) _nutChecks[r.check_key] = true;
+      }
+    });
+  }
+  save('nutChecks', _nutChecks);
+  save('suppChecks', _suppChecks);
 }
 
 // Load from local cache first (instant), then sync from Supabase
@@ -1346,6 +1449,9 @@ function loadFromCache(){
   _notes = load('notes', {});
   _prs = load('prs', _prs);
   _sets = load('sets', {});
+  _nutChecks = load('nutChecks', {});
+  _nutOverrides = load('nutOverrides', {});
+  _suppChecks = load('suppChecks', {});
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1398,7 +1504,7 @@ function renderDayTabs(){
 function renderWorkout(){
   const p = document.getElementById('p-today');
   const data = getDayData(curWeek, curDay);
-  if(!data){ p.innerHTML='<div style="padding:40px;color:var(--text-dim)">No data for this day.</div>'; return; }
+  if(!data){ p.innerHTML='<div style="padding:40px;color:var(--text-tertiary)">No data for this day.</div>'; return; }
 
   const phase = getPhase(curWeek);
   const pn = getPhaseNum(curWeek);
@@ -1460,6 +1566,9 @@ function exHTML(ex, section, idx){
   const logged = getSetLog(eid);
   const targetWt = calcTarget(ex.name, parsed.pct);
 
+  // Detect if this is a time-based exercise (rowing, running, conditioning)
+  const isTimeBased = isTimeExercise(ex.name, ex.detail);
+
   let h = `<div class="ex" onclick="toggleEx(this, event)" data-eid="${eid}">`;
   h += `<div class="ex-dot"></div><div class="ex-body">`;
   h += `<div class="ex-name">${ex.name}</div>`;
@@ -1470,44 +1579,102 @@ function exHTML(ex, section, idx){
     h += `<div class="ex-toggle">TAP TO LOG SETS</div>`;
     h += `<div class="ex-sets" onclick="event.stopPropagation()">`;
 
-    // Column headers — 6 columns
-    h += `<div class="sets-hdr">`;
-    h += `<span>SET</span><span>TARGET</span><span>WEIGHT</span><span>REPS</span><span class="sh-c">%</span><span class="sh-c">SAVE</span>`;
-    h += `</div>`;
-
-    // Per-set target reps from wave loading
-    const repScheme = parsed.repScheme; // e.g. [10,8,6,5] or [6,6,6,6]
-
-    for(let s=1; s<=numSets; s++){
-      const sv = logged[s] || {};
-      const setTarget = targetWt ? Math.round(targetWt) : 0;
-      const setReps = repScheme[s-1] || parsed.reps || '';
-      const actualWt = sv.wt ? parseFloat(sv.wt) : 0;
-      const isSaved = sv.saved;
-
-      // Calculate % of target
-      let pctClass = 'neutral';
-      let pctText = '—';
-      if(setTarget > 0 && actualWt > 0){
-        const pctVal = Math.round((actualWt / setTarget) * 100);
-        pctText = pctVal + '%';
-        pctClass = pctVal >= 100 ? 'hit' : pctVal >= 90 ? 'neutral' : 'miss';
-      }
-
-      h += `<div class="set-row" id="sr_${eid}_${s}">`;
-      h += `<div class="set-label">S${s}</div>`;
-      h += `<div class="set-target-wt">${setTarget > 0 ? setTarget+'<span style="font-size:8px;opacity:.5;margin-left:2px">lbs</span>' : '—'}</div>`;
-      h += `<input class="set-input" type="number" inputmode="decimal" placeholder="${setTarget>0?setTarget:'lbs'}" value="${sv.wt||''}" data-eid="${eid}" data-set="${s}" data-target="${setTarget}" oninput="cacheSet('${eid}',${s},'wt',this.value);updatePctBadge(this)" onfocus="this.select()">`;
-      h += `<input class="set-input" type="number" inputmode="numeric" placeholder="${setReps||'reps'}" value="${sv.reps||''}" oninput="cacheSet('${eid}',${s},'reps',this.value)" onfocus="this.select()">`;
-      h += `<div class="pct-badge ${pctClass}" data-eid="${eid}" data-set="${s}">${pctText}</div>`;
-      h += `<button class="set-confirm${isSaved?' saved':''}" onclick="confirmSet('${eid}',${s},this)" title="Save to database">${isSaved?'✓':'↑'}</button>`;
+    if(isTimeBased){
+      // TIME-BASED HEADERS: SET | TIME | DISTANCE | PACE | SAVE
+      h += `<div class="sets-hdr" style="grid-template-columns:36px 1fr 1fr 1fr 40px;">`;
+      h += `<span>SET</span><span>TIME</span><span>DIST</span><span>PACE</span><span class="sh-c">SAVE</span>`;
       h += `</div>`;
+
+      for(let s=1; s<=numSets; s++){
+        const sv = logged[s] || {};
+        const isSaved = sv.saved;
+
+        h += `<div class="set-row" id="sr_${eid}_${s}" style="grid-template-columns:36px 1fr 1fr 1fr 40px;">`;
+        h += `<div class="set-label">S${s}</div>`;
+        h += `<input class="set-input" type="text" inputmode="text" placeholder="0:00" value="${sv.wt||''}" oninput="cacheSet('${eid}',${s},'wt',this.value)" onfocus="this.select()" style="font-variant-numeric:tabular-nums;">`;
+        h += `<input class="set-input" type="text" inputmode="text" placeholder="meters" value="${sv.reps||''}" oninput="cacheSet('${eid}',${s},'reps',this.value)" onfocus="this.select()">`;
+        h += `<div class="pct-badge neutral" style="font-size:9px;">${calcPace(sv.wt, sv.reps)}</div>`;
+        h += `<button class="set-confirm${isSaved?' saved':''}" onclick="confirmSet('${eid}',${s},this)" title="Save to database">${isSaved?'✓':'↑'}</button>`;
+        h += `</div>`;
+      }
+    } else {
+      // STANDARD HEADERS: SET | TARGET | WEIGHT | REPS | % | SAVE
+      h += `<div class="sets-hdr">`;
+      h += `<span>SET</span><span>TARGET</span><span>WEIGHT</span><span>REPS</span><span class="sh-c">%</span><span class="sh-c">SAVE</span>`;
+      h += `</div>`;
+
+      const repScheme = parsed.repScheme;
+
+      for(let s=1; s<=numSets; s++){
+        const sv = logged[s] || {};
+        const setTarget = targetWt ? Math.round(targetWt) : 0;
+        const setReps = repScheme[s-1] || parsed.reps || '';
+        const actualWt = sv.wt ? parseFloat(sv.wt) : 0;
+        const isSaved = sv.saved;
+
+        let pctClass = 'neutral';
+        let pctText = '—';
+        if(setTarget > 0 && actualWt > 0){
+          const pctVal = Math.round((actualWt / setTarget) * 100);
+          pctText = pctVal + '%';
+          pctClass = pctVal >= 100 ? 'hit' : pctVal >= 90 ? 'neutral' : 'miss';
+        }
+
+        h += `<div class="set-row" id="sr_${eid}_${s}">`;
+        h += `<div class="set-label">S${s}</div>`;
+        h += `<div class="set-target-wt">${setTarget > 0 ? setTarget+'<span style="font-size:8px;opacity:.5;margin-left:2px">lbs</span>' : '—'}</div>`;
+        h += `<input class="set-input" type="number" inputmode="decimal" placeholder="${setTarget>0?setTarget:'lbs'}" value="${sv.wt||''}" data-eid="${eid}" data-set="${s}" data-target="${setTarget}" oninput="cacheSet('${eid}',${s},'wt',this.value);updatePctBadge(this)" onfocus="this.select()">`;
+        h += `<input class="set-input" type="number" inputmode="numeric" placeholder="${setReps||'reps'}" value="${sv.reps||''}" oninput="cacheSet('${eid}',${s},'reps',this.value)" onfocus="this.select()">`;
+        h += `<div class="pct-badge ${pctClass}" data-eid="${eid}" data-set="${s}">${pctText}</div>`;
+        h += `<button class="set-confirm${isSaved?' saved':''}" onclick="confirmSet('${eid}',${s},this)" title="Save to database">${isSaved?'✓':'↑'}</button>`;
+        h += `</div>`;
+      }
     }
     h += `</div>`;
   }
 
   h += `</div></div>`;
   return h;
+}
+
+// Detect time-based exercises
+function isTimeExercise(name, detail){
+  const n = name.toLowerCase();
+  const d = (detail||'').toLowerCase();
+  // Match rowing, running, 400m, 2000m, conditioning, sled, sprints
+  if(/\brow\b|rower|rowing|row interval/i.test(n)) return true;
+  if(/\b400m\b|\b2000m\b|\b100m\b/i.test(n)) return true;
+  if(/\bcondition/i.test(n) && /400m|row|run/i.test(d)) return true;
+  if(/\bsled\b/i.test(n)) return true;
+  if(/\bsprint/i.test(n)) return true;
+  if(/\blinear sprint/i.test(n)) return true;
+  // Check detail for time patterns
+  if(/\d+\s*[x×]\s*\d+\s*min/i.test(d)) return true;
+  if(/\d+\s*[x×]\s*\d+m\b/i.test(d)) return true;
+  return false;
+}
+
+// Calculate pace from time and distance (e.g. "5:03" and "1130" → "/500m")
+function calcPace(timeStr, distStr){
+  if(!timeStr || !distStr) return '—';
+  // Parse time: could be "5:03" or "5.03" or "303" (seconds)
+  let totalSec = 0;
+  const colonMatch = String(timeStr).match(/(\d+):(\d+)/);
+  if(colonMatch){
+    totalSec = parseInt(colonMatch[1])*60 + parseInt(colonMatch[2]);
+  } else {
+    const num = parseFloat(timeStr);
+    if(num > 10) totalSec = num; // assume seconds
+    else totalSec = num * 60; // assume minutes
+  }
+  const dist = parseFloat(distStr);
+  if(!totalSec || !dist || dist === 0) return '—';
+  // Calculate /500m pace
+  const pacePerM = totalSec / dist;
+  const pacePer500 = pacePerM * 500;
+  const paceMin = Math.floor(pacePer500 / 60);
+  const paceSec = Math.round(pacePer500 % 60);
+  return paceMin+':'+String(paceSec).padStart(2,'0')+'/500m';
 }
 
 function toggleEx(el, e){
@@ -1664,6 +1831,240 @@ function updatePctBadge(input){
 }
 
 
+// ═══════════════════════════════════════════════════════════
+// NUTRITION — FIXED DAILY TEMPLATE
+// ═══════════════════════════════════════════════════════════
+const MEALS = [
+  {id:'pre', time:'5:30 AM', name:'PRE-TRAINING', locked:true,
+    items:'Banana + electrolytes + 20g whey + 5g creatine',
+    macros:{p:30,c:35,f:2}, cal:278,
+    why:'Fast-digesting fuel for CNS and glycogen. Creatine saturates muscle stores. Whey provides amino acids for the session.'},
+  {id:'intra', time:'DURING', name:'INTRA-WORKOUT', locked:true,
+    items:'Cyclic dextrin or Gatorade powder sipped in water',
+    macros:{p:0,c:30,f:0}, cal:120,
+    why:'Sustains blood sugar during high-CNS sessions. Prevents performance drop in final 20 minutes. Critical in Phase 3+ daily max sessions.'},
+  {id:'post', time:'7:45 AM', name:'POST-TRAINING SHAKE', locked:true,
+    items:'40g whey + 1 banana + 40g oats + 1 tbsp peanut butter + collagen',
+    macros:{p:50,c:70,f:16}, cal:628,
+    why:'40g whey + 80g fast carbs within 20 min post-session. Triggers muscle protein synthesis. Collagen supports joint/tendon recovery from heavy loading.'},
+  {id:'breakfast', time:'9:00 AM', name:'BREAKFAST + COFFEE', locked:false,
+    items:'Oatmeal + 3-4 whole eggs + Greek yogurt with fruit & nut/dark chocolate mix + coffee with L-theanine + forkful of kimchi',
+    macros:{p:45,c:80,f:30}, cal:770,
+    why:'Sustained energy through to lunch. Eggs = complete amino profile + choline for brain function. Fermented food supports gut flora and nutrient absorption. Coffee peaks focus 30-45 min after drinking.'},
+  {id:'lunch', time:'12:30 PM', name:'LUNCH (BIGGEST MEAL)', locked:false,
+    items:'Chicken thighs + double rice or sweet potato + vegetables + avocado. 2x/week swap for wild salmon.',
+    macros:{p:55,c:90,f:28}, cal:836,
+    why:'Largest caloric load of the day. Chicken thighs > breast for sustained energy (higher fat). Avocado provides monounsaturated fats for hormone production. Salmon 2x/week covers omega-3 beyond fish oil caps.'},
+  {id:'snack', time:'3:30 PM', name:'PRE-CLASS SNACK', locked:false,
+    items:'Rice cake + peanut butter + banana OR Greek yogurt + granola + honey',
+    macros:{p:18,c:42,f:12}, cal:348,
+    why:'Non-negotiable fuel before evening yoga/pilates. 6+ hours without eating before a movement session degrades performance. Fast carbs + moderate protein sustains blood sugar through class.'},
+  {id:'dinner', time:'7:00 PM', name:'DINNER (POST YOGA/PILATES)', locked:false,
+    items:'Steak, chicken, salmon, or lamb + sweet potato or rice + vegetables. Once/week include beef liver. Add fermented food.',
+    macros:{p:50,c:55,f:22}, cal:622,
+    why:'Protein anchor for overnight muscle repair. Beef liver once/week delivers more B12, iron, copper than any supplement. Carbs replenish glycogen for tomorrow\'s 6 AM session.'},
+  {id:'late', time:'9:00 PM', name:'LATE SNACK', locked:false,
+    items:'Casein protein or cottage cheese + nuts + dark chocolate',
+    macros:{p:30,c:18,f:16}, cal:336,
+    why:'Casein digests slowly overnight — feeds muscle protein synthesis for 6-8 hours while sleeping. This is the meal most people skip that separates good recovery from elite recovery.'}
+];
+
+const SUPPS = [
+  {time:'5:30 AM', name:'Creatine 5g', why:'Strength + power output — pre-training saturation'},
+  {time:'7:45 AM', name:'Collagen', why:'Joint + tendon recovery — in post shake'},
+  {time:'9:00 AM', name:'HairForce 3 softgels', why:'Hair health + full B-complex — take with fats from breakfast'},
+  {time:'9:00 AM', name:'Probiotic', why:'Gut health + nutrient absorption'},
+  {time:'9:00 AM', name:'Liver Support', why:'Detox support'},
+  {time:'9:00 AM', name:'Vitamin D3 5000 IU', why:'Toronto = deficient without supplementation'},
+  {time:'9:00 AM', name:'L-theanine', why:'Calm focus with coffee — no jitters'},
+  {time:'7:00 PM', name:'Fish Oils', why:'Anti-inflammatory + omega-3 — take with dinner fats'},
+  {time:'7:00 PM', name:'Zinc 30mg', why:'Testosterone + recovery — monitor overlap with HairForce'},
+  {time:'9:30 PM', name:'Magnesium Complex', why:'Sleep quality + muscle recovery'},
+  {time:'9:30 PM', name:'Tart Cherry Extract', why:'Recovery + natural melatonin precursor'},
+];
+
+// Phase-based calorie targets
+function getNutTargets(){
+  const pn = getPhaseNum(curWeek);
+  if(pn<=2) return {cal:3500, p:220, c:420, f:90};
+  if(pn===3) return {cal:3700, p:230, c:450, f:95};
+  if(pn===4) return {cal:3600, p:225, c:435, f:90};
+  return {cal:3300, p:215, c:390, f:85};
+}
+
+// Nutrition state
+let _nutChecks = {}; // {date_mealId: true}
+let _nutOverrides = {}; // {date_mealId: {p,c,f}}
+let _suppChecks = {}; // {date_suppIdx: true}
+
+function getNutKey(){ 
+  const now = new Date(new Date().toLocaleString('en-US',{timeZone:'America/Toronto'}));
+  return now.toISOString().slice(0,10);
+}
+
+function toggleMealCheck(mealId, btn){
+  const key = getNutKey()+'_'+mealId;
+  _nutChecks[key] = !_nutChecks[key];
+  save('nutChecks', _nutChecks);
+  btn.classList.toggle('done', _nutChecks[key]);
+  updateNutSummary();
+  // Save to Supabase
+  sb(`nutrition_checks?check_key=eq.${encodeURIComponent(key)}`, 'PATCH', {checked: _nutChecks[key]})
+    .then(res => {
+      if(!res || res.length === 0) sb('nutrition_checks', 'POST', {check_key: key, checked: _nutChecks[key]});
+    });
+}
+
+function toggleSuppCheck(idx, btn){
+  const key = getNutKey()+'_supp_'+idx;
+  _suppChecks[key] = !_suppChecks[key];
+  save('suppChecks', _suppChecks);
+  btn.classList.toggle('done', _suppChecks[key]);
+  sb(`nutrition_checks?check_key=eq.${encodeURIComponent(key)}`, 'PATCH', {checked: _suppChecks[key]})
+    .then(res => {
+      if(!res || res.length === 0) sb('nutrition_checks', 'POST', {check_key: key, checked: _suppChecks[key]});
+    });
+}
+
+function toggleMealBlock(el){
+  el.closest('.meal-block').classList.toggle('open');
+}
+
+function showOverride(mealId){
+  const el = document.getElementById('ov_'+mealId);
+  if(el) el.classList.toggle('show');
+}
+
+function saveOverride(mealId){
+  const p = parseFloat(document.getElementById('ov_p_'+mealId).value)||0;
+  const c = parseFloat(document.getElementById('ov_c_'+mealId).value)||0;
+  const f = parseFloat(document.getElementById('ov_f_'+mealId).value)||0;
+  const key = getNutKey()+'_'+mealId;
+  _nutOverrides[key] = {p,c,f};
+  save('nutOverrides', _nutOverrides);
+  updateNutSummary();
+}
+
+function getMealMacros(meal){
+  const key = getNutKey()+'_'+meal.id;
+  if(_nutOverrides[key]) return _nutOverrides[key];
+  return meal.macros;
+}
+
+function updateNutSummary(){
+  const targets = getNutTargets();
+  let totP=0, totC=0, totF=0;
+  const today = getNutKey();
+  MEALS.forEach(m=>{
+    const key = today+'_'+m.id;
+    if(_nutChecks[key]){
+      const mac = getMealMacros(m);
+      totP += mac.p; totC += mac.c; totF += mac.f;
+    }
+  });
+  const totCal = totP*4 + totC*4 + totF*9;
+
+  const setBar = (id, val, target) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    const pct = Math.min(Math.round(val/target*100),150);
+    el.querySelector('.nut-macro-val').textContent = val;
+    el.querySelector('.nut-macro-target').textContent = '/ '+target;
+    const fill = el.querySelector('.nut-macro-fill');
+    fill.style.width = Math.min(pct,100)+'%';
+    fill.className = 'nut-macro-fill '+(pct>=90&&pct<=110?'on-track':pct>110?'over':'under');
+  };
+  setBar('nm-cal', totCal, targets.cal);
+  setBar('nm-p', totP, targets.p);
+  setBar('nm-c', totC, targets.c);
+  setBar('nm-f', totF, targets.f);
+}
+
+function renderNutrition(){
+  const p = document.getElementById('p-nutrition');
+  const targets = getNutTargets();
+  const today = getNutKey();
+  const pn = getPhaseNum(curWeek);
+
+  let h = '';
+  h += `<div class="nut-hero"><div class="nut-hero-title">DAILY NUTRITION</div>`;
+  h += `<div class="nut-hero-sub">Phase ${pn} — Target: ${targets.cal} cal / ${targets.p}P / ${targets.c}C / ${targets.f}F</div></div>`;
+
+  // Summary bar
+  h += `<div class="nut-summary">`;
+  ['cal','p','c','f'].forEach(k=>{
+    const label = k==='cal'?'CALORIES':k==='p'?'PROTEIN':k==='c'?'CARBS':'FAT';
+    const target = targets[k];
+    h += `<div class="nut-macro" id="nm-${k}">`;
+    h += `<div class="nut-macro-label">${label}</div>`;
+    h += `<div class="nut-macro-val">0</div>`;
+    h += `<div class="nut-macro-target">/ ${target}</div>`;
+    h += `<div class="nut-macro-bar"><div class="nut-macro-fill under" style="width:0%"></div></div>`;
+    h += `</div>`;
+  });
+  h += `</div>`;
+
+  // Meal blocks
+  MEALS.forEach(m=>{
+    const key = today+'_'+m.id;
+    const checked = _nutChecks[key];
+    const mac = getMealMacros(m);
+    const cal = mac.p*4 + mac.c*4 + mac.f*9;
+    const ov = _nutOverrides[key];
+
+    h += `<div class="meal-block${checked?' open':''}">`;
+    h += `<div class="meal-header" onclick="toggleMealBlock(this)">`;
+    h += `<div class="meal-time">${m.time}</div>`;
+    h += `<div class="meal-name">${m.name}</div>`;
+    h += `<div class="meal-macros-preview">${mac.p}P ${mac.c}C ${mac.f}F · ${cal} cal</div>`;
+    h += `<button class="meal-confirm${checked?' done':''}" onclick="event.stopPropagation();toggleMealCheck('${m.id}',this)">${checked?'✓':''}</button>`;
+    h += `</div>`;
+
+    h += `<div class="meal-body">`;
+    h += `<div class="meal-items">${m.items}</div>`;
+    h += `<div class="meal-why">${m.why}</div>`;
+    if(m.locked){
+      h += `<div class="meal-locked">FIXED PROTOCOL — SAME EVERY DAY</div>`;
+    } else {
+      h += `<div class="meal-override">`;
+      h += `<button class="meal-override-btn" onclick="showOverride('${m.id}')">OVERRIDE MACROS (ate something different)</button>`;
+      h += `<div class="meal-override-inputs${ov?' show':''}" id="ov_${m.id}">`;
+      h += `<div><div class="meal-ov-label">PROTEIN</div><input class="meal-ov-input" type="number" id="ov_p_${m.id}" placeholder="${m.macros.p}" value="${ov?ov.p:''}" onchange="saveOverride('${m.id}')"></div>`;
+      h += `<div><div class="meal-ov-label">CARBS</div><input class="meal-ov-input" type="number" id="ov_c_${m.id}" placeholder="${m.macros.c}" value="${ov?ov.c:''}" onchange="saveOverride('${m.id}')"></div>`;
+      h += `<div><div class="meal-ov-label">FAT</div><input class="meal-ov-input" type="number" id="ov_f_${m.id}" placeholder="${m.macros.f}" value="${ov?ov.f:''}" onchange="saveOverride('${m.id}')"></div>`;
+      h += `</div></div>`;
+    }
+    h += `</div></div>`;
+  });
+
+  // Supplements
+  h += `<div class="supp-block">`;
+  h += `<div class="supp-title">DAILY SUPPLEMENTS</div>`;
+  SUPPS.forEach((s,i)=>{
+    const skey = today+'_supp_'+i;
+    const sdone = _suppChecks[skey];
+    h += `<div class="supp-row">`;
+    h += `<div class="supp-time">${s.time}</div>`;
+    h += `<div class="supp-name">${s.name}</div>`;
+    h += `<div class="supp-why">${s.why}</div>`;
+    h += `<button class="supp-check${sdone?' done':''}" onclick="toggleSuppCheck(${i},this)">✓</button>`;
+    h += `</div>`;
+  });
+  h += `</div>`;
+
+  // Hydration reminder
+  h += `<div class="hydration-card">`;
+  h += `<div class="hydration-title">HYDRATION</div>`;
+  h += `<div class="hydration-text">4+ liters of water with lemon throughout the day</div>`;
+  h += `<div class="hydration-note">Dehydration at your training volume compromises next-day session quality. Sip consistently — don't chug.</div>`;
+  h += `</div>`;
+
+  p.innerHTML = h;
+
+  // Update summary after render
+  setTimeout(updateNutSummary, 50);
+}
+
 function markComplete(){
   const done = !isComplete(curWeek, curDay);
   setCompletion(curWeek, curDay, done);
@@ -1770,6 +2171,7 @@ function renderAll(){
   renderWorkout();
   renderPlan();
   renderStats();
+  renderNutrition();
   renderPRs();
 }
 
@@ -1778,7 +2180,7 @@ function renderAll(){
 // ═══════════════════════════════════════════════════════════
 function nav(view){
   curView = view;
-  document.querySelectorAll('.sb-btn').forEach(b=>b.classList.toggle('on', b.dataset.v===view));
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.toggle('on', b.dataset.v===view));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
   document.getElementById('p-'+view).classList.add('on');
   if(view==='today') renderWorkout();
