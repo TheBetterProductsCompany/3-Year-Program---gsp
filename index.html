@@ -1568,6 +1568,7 @@ function exHTML(ex, section, idx){
 
   // Detect if this is a time-based exercise (rowing, running, conditioning)
   const isTimeBased = isTimeExercise(ex.name, ex.detail);
+  const isCarry = /farmer|carry|carries/i.test(ex.name);
 
   let h = `<div class="ex" onclick="toggleEx(this, event)" data-eid="${eid}">`;
   h += `<div class="ex-dot"></div><div class="ex-body">`;
@@ -1579,7 +1580,23 @@ function exHTML(ex, section, idx){
     h += `<div class="ex-toggle">TAP TO LOG SETS</div>`;
     h += `<div class="ex-sets" onclick="event.stopPropagation()">`;
 
-    if(isTimeBased){
+    if(isCarry){
+      // CARRY HEADERS: SET | WEIGHT | DISTANCE | — | SAVE
+      h += `<div class="sets-hdr" style="grid-template-columns:36px 1fr 1fr 40px;">`;
+      h += `<span>SET</span><span>WEIGHT</span><span>DIST</span><span class="sh-c">SAVE</span>`;
+      h += `</div>`;
+
+      for(let s=1; s<=numSets; s++){
+        const sv = logged[s] || {};
+        const isSaved = sv.saved;
+        h += `<div class="set-row" id="sr_${eid}_${s}" style="grid-template-columns:36px 1fr 1fr 40px;">`;
+        h += `<div class="set-label">S${s}</div>`;
+        h += `<input class="set-input" type="number" inputmode="decimal" placeholder="lbs" value="${sv.wt||''}" oninput="cacheSet('${eid}',${s},'wt',this.value)" onfocus="this.select()">`;
+        h += `<input class="set-input" type="text" inputmode="text" placeholder="meters" value="${sv.reps||''}" oninput="cacheSet('${eid}',${s},'reps',this.value)" onfocus="this.select()">`;
+        h += `<button class="set-confirm${isSaved?' saved':''}" onclick="confirmSet('${eid}',${s},this)" title="Save to database">${isSaved?'✓':'↑'}</button>`;
+        h += `</div>`;
+      }
+    } else if(isTimeBased){
       // TIME-BASED HEADERS: SET | TIME | DISTANCE | PACE | SAVE
       h += `<div class="sets-hdr" style="grid-template-columns:36px 1fr 1fr 1fr 40px;">`;
       h += `<span>SET</span><span>TIME</span><span>DIST</span><span>PACE</span><span class="sh-c">SAVE</span>`;
@@ -1641,16 +1658,18 @@ function exHTML(ex, section, idx){
 function isTimeExercise(name, detail){
   const n = name.toLowerCase();
   const d = (detail||'').toLowerCase();
-  // Match rowing, running, 400m, 2000m, conditioning, sled, sprints
-  if(/\brow\b|rower|rowing|row interval/i.test(n)) return true;
+  // EXCLUDE these — they use weight/reps or weight/distance
+  if(/pendlay/i.test(n)) return false;
+  if(/farmer/i.test(n)) return false;
+  // Match rowing (not Pendlay Row), running, 400m, 2000m, conditioning, sled, sprints
+  if(/^row$|^row |rower|rowing|row interval/i.test(n)) return true;
   if(/\b400m\b|\b2000m\b|\b100m\b/i.test(n)) return true;
   if(/\bcondition/i.test(n) && /400m|row|run/i.test(d)) return true;
   if(/\bsled\b/i.test(n)) return true;
   if(/\bsprint/i.test(n)) return true;
   if(/\blinear sprint/i.test(n)) return true;
-  // Check detail for time patterns
+  // Check detail for time patterns (but not "40m" which could be carries)
   if(/\d+\s*[x×]\s*\d+\s*min/i.test(d)) return true;
-  if(/\d+\s*[x×]\s*\d+m\b/i.test(d)) return true;
   return false;
 }
 
