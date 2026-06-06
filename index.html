@@ -115,7 +115,7 @@
 <div id="login">
   <div class="l-pre">RELENTLESS PROTOCOL</div>
   <div class="l-title">RELENTLESS 42</div>
-  <div class="l-sub">35 WEEK PROTOCOL</div>
+  <div class="l-sub">52 WEEK PROTOCOL</div>
   <input type="password" id="pw" placeholder="ENTER CODE" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
   <button class="l-btn" onclick="doLogin()">ACCESS</button>
   <div class="l-err" id="lerr">INCORRECT ACCESS CODE</div>
@@ -137,247 +137,117 @@ function doLogin(){const val=document.getElementById('pw').value;if(val===PW){do
 document.getElementById('pw').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
 if(localStorage.getItem('r42auth')==='1'){document.getElementById('login').classList.add('out');document.getElementById('app').classList.add('on');window.addEventListener('DOMContentLoaded',startApp)}
 
+
 const DAYS=['MON','TUE','WED','THU','FRI','SAT','SUN'];
 const DAYNAMES=['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY'];
-const TOTAL_WEEKS=35;
+const TOTAL_WEEKS=52;
 const PHASES=[
-  {n:'FOUNDATION A',wks:[1,4],desc:'60-65%. Own every position.'},
-  {n:'FOUNDATION B',wks:[5,8],desc:'65-70%. Loads climbing.'},
-  {n:'FOUNDATION C',wks:[9,12],desc:'70-75%. Final foundation.'},
-  {n:'ACCUMULATION A',wks:[13,16],desc:'Wave loading. 75-85%.'},
-  {n:'ACCUMULATION B',wks:[17,20],desc:'Waves intensify. 78-90%.'},
-  {n:'ACCUMULATION C',wks:[21,24],desc:'Peak waves. 80-93%.'},
-  {n:'CONVERSION A',wks:[25,28],desc:'Daily maxes. Eccentric triphasic.'},
-  {n:'CONVERSION B',wks:[29,32],desc:'Daily maxes. Isometric triphasic.'},
-  {n:'CONVERSION C',wks:[33,35],desc:'Daily maxes. Explosive concentric.'},
+  {n:'RECONSTRUCTION',wks:[1,12],desc:'Patterns + base. 62-75%.'},
+  {n:'ACCUMULATION',wks:[13,24],desc:'Strength + engine. 68-82%.'},
+  {n:'CONVERSION',wks:[25,36],desc:'Strength to power. 73-90%.'},
+  {n:'EXPRESSION',wks:[37,52],desc:'Peak athleticism. 78-95%+.'},
 ];
 function getPhase(w){return PHASES.find(p=>w>=p.wks[0]&&w<=p.wks[1])||PHASES[PHASES.length-1];}
 function getPhaseNum(w){return PHASES.findIndex(p=>w>=p.wks[0]&&w<=p.wks[1])+1;}
 function E(name,detail,note){return{name,detail,note:note||''};}
 
-function isDl(w){return w===4||w===8||w===12||w===16||w===20||w===24||w===28||w===32;}
-function isConv(w){return w>=25&&w<=35&&!isDl(w);}
-function isWave(w){return w>=13&&w<=24&&!isDl(w);}
-function lerp(s,e,w,sw,ew){if(w>=ew)return e;return Math.round(s+(e-s)*((w-sw)/(ew-sw)));}
+function cycleNum(w){return Math.ceil(w/4);}
+function weekInCycle(w){return ((w-1)%4)+1;}
+function isReset(w){return weekInCycle(w)===4;}
+function isStab(w){return weekInCycle(w)===1;}
+function isPeak(w){return weekInCycle(w)===3;}
 function r5(n){return Math.round(n/5)*5;}
+function wavePct(w){const c=cycleNum(w);const base=68+(c-1)*(20/12);const wic=weekInCycle(w);if(wic===1)return base-6;if(wic===2)return base;if(wic===3)return base+7;return 60;}
+function wt(rm,w){return r5(rm*wavePct(w)/100);}
+// power day = low rep; volume day = higher rep
+function repsP(w){const wic=weekInCycle(w);if(wic===1)return'5×3';if(wic===2)return'5×3';if(wic===3)return'6×2';return'4×3';}
+function repsV(w){const wic=weekInCycle(w);if(wic===1)return'4×8';if(wic===2)return'4×6';if(wic===3)return'4×5';return'3×8';}
+function focusLabel(w){const wic=weekInCycle(w);if(wic===1)return'STABILIZER';if(wic===2)return'PROGRESSION';if(wic===3)return'PEAK';return'RESET';}
 
-// ═══════════════════════════════════════════════════════════
-// VERIFIED 1RMs (May 2026):
-// Bench: 315 | Rows: 230 | BSS: 295 | Snatch: 145
-// Arnold: ~70/arm | Chin-ups: ~+33 | Pull-ups: ~+27
-// Cossack: ~220 | OHS: 155 | Dips: BW+60
-// ═══════════════════════════════════════════════════════════
+const RM={bench:320,arnold:58,pull:33,chin:70,row:245,snatch:145,snrdl:160,bss:275,front:225,cossack:165,stepup:185};
+function LP(name,rm,w,note){return E(name,repsP(w)+' @ '+wt(rm,w)+' lbs',note||'');}  // power
+function LV(name,rm,w,note){return E(name,repsV(w)+' @ '+wt(rm,w)+' lbs',note||'');}  // volume
 
-// Flat Bench: 1RM 315. Working 195→270
-function benchWt(w){const v=lerp(195,270,w,1,35);return isDl(w)?r5(v*0.6):r5(v);}
-// Pendlay Row: 1RM 230. Working 145→200
-function rowWt(w){const v=lerp(145,200,w,1,35);return isDl(w)?r5(v*0.6):r5(v);}
-// BSS: 1RM ~295. Working 185→250
-function bssWt(w){const v=lerp(185,250,w,1,35);return isDl(w)?r5(v*0.55):r5(v);}
-// Hang Snatch: 1RM 145. W1-4 technique 55→65, then 65→130
-function snWt(w){const v=w<=4?lerp(55,65,w,1,4):lerp(65,130,w,5,35);return isDl(w)?r5(v*0.55):r5(v);}
-// DB Arnold Press: 1RM ~70/arm. Working 42→60
-function arnoldWt(w){const v=lerp(42,60,w,1,35);return isDl(w)?r5(v*0.6):r5(v);}
-// Chin-ups: est max +33. Working +10→+28
-function chinWt(w){const v=lerp(10,28,w,1,35);return isDl(w)?Math.max(0,r5(v*0.6)):r5(v);}
-// Pull-ups: est max +27. Working +8→+22
-function puWt(w){const v=lerp(8,22,w,1,35);return isDl(w)?Math.max(0,r5(v*0.6)):r5(v);}
-// Cossack: 1RM ~220. Working 135→190
-function cosWt(w){const v=lerp(135,190,w,1,35);return isDl(w)?r5(v*0.5):r5(v);}
-// SG RDL: est from row/snatch strength. Working 95→185
-function sgrdlWt(w){const v=lerp(95,185,w,1,35);return isDl(w)?r5(v*0.55):r5(v);}
-// OHS: 1RM 155. Working 95→140
-function ohsWt(w){const v=lerp(95,140,w,1,35);return isDl(w)?r5(v*0.55):r5(v);}
-// Dips: BW×12, +50×3. BW W1-8, then +10→+45
-function dipWt(w){if(w<=8)return 0;const v=lerp(10,45,w,9,35);return isDl(w)?r5(v*0.5):r5(v);}
-// Cable Swing: 15→52
-function cableWt(w){return lerp(15,52,w,1,35);}
-// Cable SLRDL Rear Delt Fly: 10→42
-function cslrdlWt(w){return lerp(10,42,w,1,35);}
-// KB Swings: 60→90 lbs
-function kbWt(w){return lerp(60,90,w,1,35);}
-// Walking Lunges: 45→70 per arm
-function lungeWt(w){return lerp(45,70,w,1,35);}
-// Farmer's Carries: 60→90 per arm
-function carryWt(w){return lerp(60,90,w,1,35);}
-// Row pace: 1:45→1:31
-function rowPace(w){const s=lerp(105,91,w,1,35);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
-// 400m: 70s→52s (estimated from 5:17/km pace)
-function run400(w){return lerp(70,52,w,1,35);}
+// ═══ DAILY PRIMER (every weights day, 10 min) ═══
+function primer(){return E('Primer (10 min)','Pogos 3×20 + SL pogos + band walks + hanging leg raises + foot/toe work','Springs + glutes + anti-extension + feet. Coached, not rushed.');}
 
-function setsReps(w){
-  if(isDl(w))return'3×5';
-  if(w<=12)return'4×'+(w<=4?'6':w<=8?'6':'5');
-  if(isWave(w)){const k=((w-1)%4)+1;if(w<=16)return k<=2?'10-8-6-5':k===3?'8-6-5-3':'3×5';if(w<=20)return k===1?'8-6-4-2':k===2?'6-4-3-2':k===3?'6-4-2-1':'3×4';return k===1?'5-3-2-1':k===2?'5-3-1-1':k===3?'4-2-1-1':'3×3';}
-  if(isConv(w))return'Max+3×2';return'4×5';
-}
-function triStr(w){if(w<=28)return'ECC 5s';if(w<=32)return'ISO 3s';return'EXPLOSIVE';}
-function ssName(w){return w%2===1?'Front Rack Split Squat':'Back Barbell BSS';}
-function ssNote(w){return w%2===1?'Front rack. Upright torso.':'Rear foot elevated. Deep ROM.';}
-
-// ═══════════════════════════════════════════════════════════
-// AM RUNNING
-// ═══════════════════════════════════════════════════════════
-function getRunData(w,d){
-  const DL=isDl(w);
-  if(d===6)return{title:'OFF',focus:'Complete Rest',duration:'—',exercises:[E('OFF','No running. No training.','')]};
-  if(d===0){
-    return{title:'SPEED',focus:'Sprint Technique @ 85%',duration:'30-40 min',exercises:[
-      E('Dynamic Warmup','10 min','High knees, butt kicks, A-skips, B-skips, leg swings.'),
-      E('Sprint Build-ups','3×60m @ 70-80%','Gradually increase.'),
-      E('Sprints',DL?'4×20m @ 75%':'6×10m + 4×20m + 2×40m @ 85%',w<=12?'Mechanics. Crisp.':'Speed development. Sub-max.'),
-      E('Cooldown Jog','5-10 min','Easy.')
-    ]};
-  }
-  if(d===1){
-    const dur=w<=8?'25 min':w<=16?'28 min':w<=24?'30 min':'35 min';
-    const tb=w<=8?'5 min tempo':w<=16?'10 min tempo':w<=24?'15 min tempo':'20 min sustained';
-    return{title:'TEMPO',focus:'Z2-Z3',duration:dur,exercises:[E('Tempo Run',dur,'Z2 base + '+tb+' at Z3. RPE 6.')]};
-  }
-  if(d===2)return{title:'EASY',focus:'Z1-Z2',duration:'20-25 min',exercises:[E('Easy Run','20-25 min @ <153 bpm','Conversational. RPE 4.')]};
-  if(d===3){
-    const reps=w<=8?'4':w<=12?'6':w<=20?'6':'8';
-    const pace=run400(w)+'s';
-    return{title:'INTERVALS',focus:'400m Repeats @ 85%',duration:'35-45 min',exercises:[
-      E('Warmup Jog','10 min',''),
-      E('400m Intervals',reps+'×400m @ '+pace,'Hard but controlled. 90s-2min walk rest. RPE 7.'),
-      E('Cooldown Jog','10 min','')
-    ]};
-  }
-  if(d===4)return{title:'EASY',focus:'Z2 Short',duration:'20-25 min',exercises:[E('Easy Run','20-25 min @ Z2','RPE 4.')]};
-  if(d===5){
-    const dur=w<=8?'30 min':w<=16?'35 min':w<=24?'40 min':'45-50 min';
-    return{title:'LONG RUN',focus:'Z2 Aerobic Base',duration:dur,exercises:[E('Long Run',dur+' @ Z2','Negative split. RPE 5.')]};
-  }
-  return{title:'OFF',focus:'Rest',duration:'—',exercises:[]};
+// ═══ AM CONDITIONING ═══
+function getCond(w,d){
+  const reset=isReset(w);
+  const pl=reset?'quality only':isPeak(w)?'peak':isStab(w)?'fundamental':'progression';
+  if(d===0)return{title:'SKI + POGOS',duration:'40 min',ex:[E('Ski Erg',reset?'15 min':'6×250m','Lats + core.'),E('Pogo Jumps + SL Pogos','3×20 + 2×10 each',pl),E('Foot + Toe Work','5 min','Barefoot. Extra L big toe.')]};
+  if(d===1)return{title:'RUN INTERVALS',duration:'40 min',ex:[E('Run — Intervals',(w<=12?'4':'6')+'×400m @ 85%','Threshold.'),E('Lateral Bounds','4×5 each (R first)',pl),E('Lateral Band Walks','3×15 each','Glute med.')]};
+  if(d===2)return{title:'ROW + POGOS',duration:'35 min',ex:[E('Row',reset?'15 min':'15-20 min','Posterior chain.'),E('Pogo Jumps','3×20',pl),E('Foot + Toe Work','5 min','Barefoot.')]};
+  if(d===3)return{title:'RUN TEMPO',duration:'35 min',ex:[E('Run — Tempo',reset?'20 min':'25-30 min Z2-Z3','Threshold base.'),E('SL Pogo Jumps + Skipping','3×12 each + 5 min',pl),E('Lateral Band Walks','3×15 each','Glute med.')]};
+  if(d===4)return{title:'EASY + POWER',duration:'35 min',ex:[E('Row or Ski',reset?'15 min':'15-20 min easy','Recovery pace.'),E('Lateral Ball Throw','4×5 each','Rotational power.'),E('Pogo Jumps','3×20',pl)]};
+  if(d===5)return{title:'LONG RUN',duration:'45-55 min',ex:[E('Run — Long',reset?'25 min':'40-50 min Z2','Aerobic base. Negative split.'),E('Skipping','10 min','Calf + rhythm.'),E('Foot + Toe Work','5 min','Barefoot.')]};
+  return{title:'OFF',duration:'—',ex:[E('OFF','Rest.','')]};
 }
 
-// ═══════════════════════════════════════════════════════════
-// MONDAY — POWER
-// ═══════════════════════════════════════════════════════════
-function getMonday(w){
-  const DL=isDl(w);const m=[];
-  m.push(E('Flat Bench Press',setsReps(w)+' @ '+benchWt(w)+' lbs',''));
-  m.push(E('Pendlay Rows',setsReps(w)+' @ '+rowWt(w)+' lbs','Dead stop. Explosive off floor.'));
-  m.push(E(ssName(w),'4×'+(w<=12?'8':'6')+' each @ '+bssWt(w)+' lbs',ssNote(w)));
-  m.push(E('KB Swings','4×'+(w<=12?'15':'12')+' @ '+kbWt(w)+' lbs','Glutes HARD at top. Ribcage DOWN.'));
-  m.push(E('E-Ball Steamrollers','3×'+(w<=8?'30s':w<=16?'45s':'60s')+' each dir','Anti-fragmentation.'));
-  m.push(E('Slow Cable Swing','3×6 each (16s/rep) @ '+cableWt(w)+' lbs','Rotation.'));
-  return{title:'POWER',focus:'Push + Pull + Squat + Hinge + Core + Rotation',duration:'60-75 min',conditioning:[],core:[],prep:[],main:m,finisher:[]};
+// ═══ AM WEIGHTS (each big rock 2x: power + volume; longevity rotation) ═══
+function getWeights(w,d){
+  const reset=isReset(w);
+  if(d===0)return{title:'LOWER POWER',main:[ primer(),
+    isPeak(w)?E('Snatches','heavy triple @ ~'+wt(RM.snatch,w),'POWER. Technical.'):LP('Snatches',RM.snatch,w,'POWER. Technical.'),
+    LP('Front Squat',RM.front,w,'POWER. 2s pause.'),
+    E('Farmer\'s / Suitcase Carry','4×40m','Posture + grip + anti-tilt. Suitcase = single-arm R first.'),
+    E('Cable Chop + Lift',repsV(w)+' each','ROTATION. Slow eccentric = deceleration.'),
+    E('Loaded Calf Raises',repsV(w),'Ground force. Full stretch.')]};
+  if(d===1)return{title:'UPPER HEAVY',main:[ primer(),
+    LV('Flat Bench',RM.bench,w,'HEAVY.'),
+    E('Weighted Pull-ups',repsV(w)+' @ +'+wt(RM.pull,w)+' lbs','HEAVY. Pronated.'),
+    E('DB Shoulder Press',repsV(w)+' @ '+wt(RM.arnold,w)+' ea','L matches R.'),
+    E('Pallof Press','3×12 each','ROTATION. Anti-rotation. Resist the twist.')]};
+  if(d===2)return{title:'HINGE + LOWER VOLUME',main:[ primer(),
+    LV('Snatch RDL',RM.snrdl,w,'HEAVY. Full stretch.'),
+    LV('Front Squat',RM.front,w,'VOLUME. Tempo.'),
+    LV(w%2===1?'Front Rack BSS':'Back BSS',RM.bss,w,'STRENGTH. R first.'),
+    E('Nordic Curls',repsV(w)+(isStab(w)?' (band)':''),'Eccentric. Lower slow.')]};
+  if(d===3)return{title:'UPPER VOLUME',main:[ primer(),
+    LV('Pendlay Rows',RM.row,w,'Dead stop.'),
+    E('Weighted Chin-ups',repsV(w)+' @ +'+wt(RM.chin,w)+' lbs','VOLUME. Supinated.'),
+    E('Face Pulls','3×15','External rotation. Weak L delt focus.'),
+    E('Cable Chop + Lift',repsV(w)+' each','ROTATION. Deceleration.')]};
+  if(d===4)return{title:'LOWER POWER 2',main:[ primer(),
+    isPeak(w)?E('Snatches','heavy triple @ ~'+wt(RM.snatch,w),'POWER.'):LP('Snatches',RM.snatch,w,'POWER. Technical.'),
+    LV('Step-up → Reverse Lunge',RM.stepup,w,'R first +1 set. Step up, control to reverse lunge.'),
+    LV('Cossack Squat',RM.cossack,w,'R first. Adductors.'),
+    LV('Snatch RDL',RM.snrdl,w,'VOLUME.')]};
+  if(d===5)return{title:'ATHLETIC + MOBILITY',main:[ primer(),
+    LV('Flat Bench',RM.bench,w,'VOLUME.'),
+    LV(w%2===1?'Back BSS':'Front Rack BSS',RM.bss,w,'VOLUME. R first.'),
+    E('Nordic Curls',repsV(w),'Eccentric.'),
+    E('Rings','15-20 min','Skin the cats, levers, muscle-ups, L-sits.'),
+    E('TGU','2×3 each (R bias)','Full-body rotation + control.')]};
+  return{title:'RECOVERY',main:[E('Rest','Full recovery.','')]};
 }
 
-// ═══════════════════════════════════════════════════════════
-// TUESDAY — OLYMPIC + SHOULDERS
-// ═══════════════════════════════════════════════════════════
-function getTuesday(w){
-  const DL=isDl(w);const m=[];
-  m.push(E('Hang Snatches',(w<=8?'5×3':'4×'+(w<=16?'3':'2'))+' @ '+snWt(w)+' lbs','Full extension.'));
-  m.push(E('Chin-ups','4×'+(w<=12?'6':'4')+' @ +'+chinWt(w)+' lbs','Supinated. Full ROM.'));
-  m.push(E('DB Arnold Press','4×'+(w<=12?'8':'6')+' @ '+arnoldWt(w)+' lbs ea','Internal → external rotation.'));
-  m.push(E('Barbell Cossack Squat','3×'+(w<=12?'8':'6')+' each @ '+cosWt(w)+' lbs','3s hold at bottom.'));
-  m.push(E('Seated Squeeze Ball Rotation','3×10 each','Ball between knees + biceps. '+(w<=4?'Floor. Feet down.':w<=12?'E-ball. Feet on ground.':w<=24?'E-ball. Feet LIFTED.':'E-ball. Feet up. Heavier MB.')));
-  m.push(E('Rower','15-20 min @ '+rowPace(w)+'/500m','Aerobic engine. Stroke quality.'));
-  return{title:'OLYMPIC + SHOULDERS',focus:'Snatch + Pull + Push + Mobility + Core + Row',duration:'60-75 min',conditioning:[],core:[],prep:[],main:m,finisher:[]};
-}
-
-// ═══════════════════════════════════════════════════════════
-// WEDNESDAY — BODYWEIGHT + HINGE
-// ═══════════════════════════════════════════════════════════
-function getWednesday(w){
-  const DL=isDl(w);const m=[];
-  m.push(E('Pull-ups','4×'+(w<=12?'6':'4')+' @ +'+puWt(w)+' lbs','Pronated. Full ROM.'));
-  m.push(E('Dips','4×'+(w<=8?'10 BW':'6 @ +'+(dipWt(w)>0?dipWt(w)+' lbs':'BW')),''));
-  m.push(E('Snatch Grip RDL','4×6 @ '+sgrdlWt(w)+' lbs','Wide grip. Full ROM. Feel glutes + hamstrings.'));
-  m.push(E('Leg Press','4×'+(w<=12?'10':'8'),''));
-  m.push(E('Turkish Get Up','2×3 each side','~'+(w<=4?'25-30':w<=12?'35-50':w<=24?'50-65':'65-80')+' lbs.'));
-  m.push(E('Ring Practice','15-20 min','Skin the cats. Levers. Muscle-ups. L-sits. Support holds.'));
-  return{title:'BODYWEIGHT + HINGE',focus:'Pull + Push + Hinge + Squat + Core + Rings',duration:'60-75 min',conditioning:[],core:[],prep:[],main:m,finisher:[]};
-}
-
-// ═══════════════════════════════════════════════════════════
-// THURSDAY — EXPLOSIVE + UNILATERAL
-// ═══════════════════════════════════════════════════════════
-function getThursday(w){
-  const DL=isDl(w);const m=[];
-  m.push(E('Hang Snatches',(w<=8?'5×3':'4×'+(w<=16?'3':'2'))+' @ '+snWt(w)+' lbs','Second snatch day. Technical.'));
-  m.push(E('Cable SLRDL Rear Delt Fly','3×8 each @ '+cslrdlWt(w)+' lbs','Hinge + glute + rear delt + anti-rotation.'));
-  m.push(E('DB Walking Lunges','4×12 each @ '+lungeWt(w)+' lbs ea','Get mean.'));
-  m.push(E('Med Ball Slams','3×8','Explosive overhead to floor. Full body.'));
-  m.push(E('E-Ball Steamrollers','3×'+(w<=8?'30s':w<=16?'45s':'60s')+' each dir','Anti-fragmentation.'));
-  m.push(E('Athletic Circuit A','5 min: Lateral bounds + Jump lunges + Skippings + Forward bounds','Explosive. Move fast.'));
-  return{title:'EXPLOSIVE + UNILATERAL',focus:'Snatch + Hybrid + Lunges + Power + Core + Athletic',duration:'60-75 min',conditioning:[],core:[],prep:[],main:m,finisher:[]};
-}
-
-// ═══════════════════════════════════════════════════════════
-// FRIDAY — PROTECTION + MOBILITY
-// ═══════════════════════════════════════════════════════════
-function getFriday(w){
-  const DL=isDl(w);const m=[];
-  m.push(E('Cable YTW','3×10 each position','Shoulder insurance. Lower traps + rotator cuff.'));
-  m.push(E('Plank Tricep Pushups','4×max','Elbows tight. Full ROM. Log reps.'));
-  m.push(E('Barbell Cossack Squat','3×'+(w<=12?'8':'6')+' each @ '+cosWt(w)+' lbs','3s hold at bottom.'));
-  m.push(E('Hamstring Sliders','3×8 each (4s slide out)','Eccentric protection. Sprint insurance.'));
-  m.push(E('Seated Squeeze Ball Rotation','3×10 each','Ball between knees + biceps. '+(w<=4?'Floor. Feet down.':w<=12?'E-ball. Feet on ground.':w<=24?'E-ball. Feet LIFTED.':'E-ball. Feet up. Heavier MB.')));
-  m.push(E('Slow Cable Swing','3×6 each (16s/rep) @ '+cableWt(w)+' lbs','Second swing day.'));
-  return{title:'PROTECTION + MOBILITY',focus:'Shoulders + Push + Mobility + Hamstrings + Core + Rotation',duration:'60-75 min',conditioning:[],core:[],prep:[],main:m,finisher:[]};
-}
-
-// ═══════════════════════════════════════════════════════════
-// SATURDAY — MOVEMENT + MOBILITY
-// ═══════════════════════════════════════════════════════════
-function getSaturday(w){
-  const DL=isDl(w);const m=[];
-  m.push(E('Farmer\'s Carries','4×40m @ '+carryWt(w)+' lbs ea','Total body tension. Near-sprint.'));
-  m.push(E('KB Swings','4×'+(w<=12?'15':'12')+' @ '+kbWt(w)+' lbs','Second KB day. Glute frequency.'));
-  m.push(E('Handstand Practice','5-10 min','Wall → freestanding. Shoulder stability.'));
-  m.push(E('Overhead Squat','4×'+(w<=12?'5':'3')+' @ '+ohsWt(w)+' lbs','3s hold at bottom. THE mobility exercise.'));
-  m.push(E('Turkish Get Up','2×3 each side','~'+(w<=4?'25-30':w<=12?'35-50':w<=24?'50-65':'65-80')+' lbs.'));
-  m.push(E('Slow Cable Swing','3×6 each (16s/rep) @ '+cableWt(w)+' lbs','Third swing day.'));
-  return{title:'MOVEMENT + MOBILITY',focus:'Carry + Hinge + Bodyweight + Mobility + Core + Rotation',duration:'60-75 min',conditioning:[],core:[],prep:[],main:m,finisher:[]};
-}
-
-// ═══════════════════════════════════════════════════════════
-// SUNDAY — OFF
-// ═══════════════════════════════════════════════════════════
-function getSunday(w){
-  return{title:'OFF',focus:'Complete Rest',duration:'—',conditioning:[],core:[],prep:[],
-    main:[E('OFF','No training. No running. Nothing.','')],finisher:[]};
-}
-
-// ═══════════════════════════════════════════════════════════
-// PM YOGA
-// ═══════════════════════════════════════════════════════════
 function getEvening(d){
-  if(d===0)return{title:'YOGA',focus:'Yoga',duration:'50 min',options:[E('Yoga','PM','Yin. Deep recovery.')]};
-  if(d===1)return{title:'YOGA',focus:'Yoga',duration:'50 min',options:[E('Yoga','PM','Vinyasa flow.')]};
-  if(d===2)return{title:'YOGA',focus:'Yoga',duration:'55 min',options:[E('Yoga','PM','Vinyasa. T-spine rotation.')]};
-  if(d===3)return{title:'YOGA',focus:'Yoga',duration:'50 min',options:[E('Yoga','PM','Deep hip openers.')]};
-  if(d===4)return{title:'YOGA',focus:'Yoga',duration:'60 min',options:[E('Yoga','PM','Yin. Recovery.')]};
-  if(d===5)return{title:'YOGA',focus:'Yoga',duration:'60 min',options:[E('Yoga','PM','Full body mobility.')]};
-  return{title:'OFF',focus:'Off',duration:'—',options:[E('Nothing','Rest.','')]};
-}
-
-// ═══════════════════════════════════════════════════════════
-// MASTER ROUTER
-// ═══════════════════════════════════════════════════════════
-function getSession(w,d){
-  if(d===0)return getMonday(w);if(d===1)return getTuesday(w);if(d===2)return getWednesday(w);
-  if(d===3)return getThursday(w);if(d===4)return getFriday(w);if(d===5)return getSaturday(w);
-  return getSunday(w);
+  const notes=['Yin.','Vinyasa.','T-spine + shoulders.','Deep hips.','Yin.','Full mobility.'];
+  if(d===6)return{title:'OFF',focus:'Off',duration:'—',options:[E('Cold Plunge','5-10 min','Recovery.'),E('Mobility Flow','15 min','Bias R hip + L shoulder.')]};
+  return{title:'YOGA',focus:'Yoga',duration:'50-60 min',options:[E('Yoga','PM',notes[d])]};
 }
 
 function getDayData(w,d){
-  const s=getSession(w,d);const r=getRunData(w,d);
-  return{run:r,
-    am:{title:s.title,focus:s.focus,duration:s.duration,conditioning:s.conditioning,core:s.core,rings:[]},
-    pm:{title:s.title,focus:s.focus,duration:s.duration,prep:s.prep||[],iso:[],main:s.main,conditioning:s.finisher},
-    eve:getEvening(d)};
+  if(d===6){
+    return{run:{title:'RECOVERY',focus:'Cold Plunge + Mobility',duration:'40 min',exercises:[E('Cold Plunge','5-10 min',''),E('Skipping','10 min easy','Light calf.'),E('Full Mobility Flow','15 min','R hip + L shoulder.'),E('Foot + Toe Work','5 min','')]},
+      am:{title:'RECOVERY',focus:'Rest',duration:'',conditioning:[],core:[],rings:[]},
+      pm:{title:'RECOVERY',focus:'Rest',duration:'',prep:[],iso:[],main:[E('Rest','Full recovery.','')],conditioning:[]},
+      eve:getEvening(6)};
+  }
+  const c=getCond(w,d);const wts=getWeights(w,d);
+  return{
+    run:{title:c.title,focus:'Conditioning + Plyo',duration:c.duration,exercises:c.ex},
+    am:{title:wts.title,focus:focusLabel(w),duration:'',conditioning:[],core:[],rings:[]},
+    pm:{title:wts.title,focus:focusLabel(w),duration:'55-70 min',prep:[],iso:[],main:wts.main,conditioning:[]},
+    eve:getEvening(d)
+  };
 }
 
 let curWeek = 1;
 let curDay = 0;
 let curView = 'today';
-const PROG_START = new Date(2026, 2, 9);
+const PROG_START = new Date(2026, 4, 20);
 
 const SB_URL = 'https://foiwnopzonvovaqhrfhw.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvaXdub3B6b252b3ZhcWhyZmh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5OTU3ODUsImV4cCI6MjA4ODU3MTc4NX0.XwrO960sSowp-TfyoooAftXxumBL1OAWZ47AZpo4TPc';
@@ -447,22 +317,22 @@ function renderWorkout(){
   const p=document.getElementById('p-today');const data=getDayData(curWeek,curDay);if(!data){p.innerHTML='<div style="padding:40px;color:var(--text-tertiary)">No data.</div>';return}
   let h='';const am=data.am,pm=data.pm,phase=getPhase(curWeek);
   h+=`<div class="dh-code">W${curWeek} — ${DAYNAMES[curDay]}</div>`;
-  h+=`<div class="dh-meta"><div class="dh-m"><div class="dh-m-l">Phase</div><div class="dh-m-v">${phase.n}</div></div><div class="dh-m"><div class="dh-m-l">Week</div><div class="dh-m-v">${curWeek} / 35</div></div></div>`;
+  h+=`<div class="dh-meta"><div class="dh-m"><div class="dh-m-l">Phase</div><div class="dh-m-v">${phase.n}</div></div><div class="dh-m"><div class="dh-m-l">Week</div><div class="dh-m-v">${curWeek} / 52</div></div></div>`;
   
   h+=`<div style="display:flex;gap:8px;margin:20px 0;">`;
-  h+=`<button id="runBtn" onclick="toggleBlock('run')" style="flex:1;padding:16px;background:var(--surface);border:1px solid var(--glass-border);border-radius:var(--radius);color:var(--text);font-family:'LEMON MILK',sans-serif;font-size:10px;letter-spacing:3px;cursor:pointer;transition:all .25s;">RUN</button>`;
-  h+=`<button id="amBtn" onclick="toggleBlock('am')" style="flex:1;padding:16px;background:var(--surface);border:1px solid var(--glass-border);border-radius:var(--radius);color:var(--text);font-family:'LEMON MILK',sans-serif;font-size:10px;letter-spacing:3px;cursor:pointer;transition:all .25s;">WEIGHTS</button>`;
-  h+=`<button id="eveBtn" onclick="toggleBlock('eve')" style="flex:1;padding:16px;background:var(--surface);border:1px solid var(--glass-border);border-radius:var(--radius);color:var(--text);font-family:'LEMON MILK',sans-serif;font-size:10px;letter-spacing:3px;cursor:pointer;transition:all .25s;">YOGA</button>`;
+  h+=`<button id="runBtn" onclick="toggleBlock('run')" style="flex:1;padding:14px 6px;background:var(--surface);border:1px solid var(--glass-border);border-radius:var(--radius);color:var(--text);font-family:'LEMON MILK',sans-serif;font-size:9px;letter-spacing:2px;cursor:pointer;transition:all .25s;">COND</button>`;
+  h+=`<button id="amBtn" onclick="toggleBlock('am')" style="flex:1;padding:14px 6px;background:var(--surface);border:1px solid var(--glass-border);border-radius:var(--radius);color:var(--text);font-family:'LEMON MILK',sans-serif;font-size:9px;letter-spacing:2px;cursor:pointer;transition:all .25s;">WEIGHTS</button>`;
+  h+=`<button id="eveBtn" onclick="toggleBlock('eve')" style="flex:1;padding:14px 6px;background:var(--surface);border:1px solid var(--glass-border);border-radius:var(--radius);color:var(--text);font-family:'LEMON MILK',sans-serif;font-size:9px;letter-spacing:2px;cursor:pointer;transition:all .25s;">YOGA</button>`;
   h+=`</div>`;
 
   const run=data.run;
-  h+=`<div id="runBlock" style="display:none;"><div class="dh-meta"><div class="dh-m"><div class="dh-m-l">Run</div><div class="dh-m-v">${run.title}</div></div><div class="dh-m"><div class="dh-m-l">Duration</div><div class="dh-m-v">${run.duration}</div></div></div>`;
+  h+=`<div id="runBlock" style="display:block;"><div class="dh-meta"><div class="dh-m"><div class="dh-m-l">Cardio</div><div class="dh-m-v">${run.title}</div></div><div class="dh-m"><div class="dh-m-l">Duration</div><div class="dh-m-v">${run.duration}</div></div></div>`;
   if(run.exercises&&run.exercises.length){h+=`<div class="sec"><div class="sec-h">${run.focus}</div>`;run.exercises.forEach((ex,i)=>{h+=exHTML(ex,'run_ex',i)});h+=`</div>`}
   h+=`</div>`;
 
-  h+=`<div id="amBlock" style="display:none;"><div class="dh-meta"><div class="dh-m"><div class="dh-m-l">Focus</div><div class="dh-m-v">${am.focus}</div></div><div class="dh-m"><div class="dh-m-l">Duration</div><div class="dh-m-v">${am.duration}</div></div></div>`;
-  if(am.conditioning&&am.conditioning.length){h+=`<div class="sec"><div class="sec-h">WARMUP</div>`;am.conditioning.forEach((ex,i)=>{h+=exHTML(ex,'am_cn',i)});h+=`</div>`}
-  if(pm.main&&pm.main.length){h+=`<div class="sec"><div class="sec-h">WORKING EXERCISES</div>`;pm.main.forEach((ex,i)=>{h+=exHTML(ex,'pm_mw',i)});h+=`</div>`}
+
+  h+=`<div id="amBlock" style="display:none;"><div class="dh-meta"><div class="dh-m"><div class="dh-m-l">Focus</div><div class="dh-m-v">${pm.focus}</div></div><div class="dh-m"><div class="dh-m-l">Duration</div><div class="dh-m-v">${pm.duration||'60-75 min'}</div></div></div>`;
+  if(pm.main&&pm.main.length){h+=`<div class="sec"><div class="sec-h">LIFTS</div>`;pm.main.forEach((ex,i)=>{h+=exHTML(ex,'pm_mw',i)});h+=`</div>`}
   h+=`</div>`;
 
   const eve=data.eve;
@@ -595,7 +465,7 @@ function markComplete(){const done=!isComplete(curWeek,curDay);setCompletion(cur
 function renderPlan(){const p=document.getElementById('p-plan');let h='';PHASES.forEach((ph,pi)=>{h+=`<div style="margin-bottom:28px"><div class="ph-title">Phase ${pi+1} — ${ph.n}</div><div class="ph-desc">${ph.desc}</div>`;for(let w=ph.wks[0];w<=ph.wks[1];w++){const isCur=w===curWeek;const allDone=[0,1,2,3,4,5,6].every(d=>isComplete(w,d));h+=`<div class="pw-row${isCur?' cur':''}" onclick="curWeek=${w};curDay=0;nav('today')"><div class="pw-num">Week ${w}</div><div class="pw-focus">${ph.n}</div><div class="pw-status">${allDone?'✓ COMPLETE':isCur?'CURRENT':'—'}</div></div>`}h+=`</div>`});p.innerHTML=h}
 
 function renderStats(){const p=document.getElementById('p-stats');const prs=getPRs();const comp=getCompletions();const ts=Object.keys(comp).filter(k=>comp[k]).length;const tp=curWeek*7;
-  let h=`<div class="ph-title" style="margin-bottom:20px">PROGRAM OVERVIEW</div><div class="sg"><div class="sc"><div class="sc-l">Sessions</div><div class="sc-v">${ts}</div><div class="sc-s">of ${tp} possible</div></div><div class="sc"><div class="sc-l">Week</div><div class="sc-v">${curWeek}</div><div class="sc-s">of 35</div></div><div class="sc"><div class="sc-l">Phase</div><div class="sc-v">${getPhaseNum(curWeek)}</div><div class="sc-s">${getPhase(curWeek).n}</div></div><div class="sc"><div class="sc-l">Rate</div><div class="sc-v">${tp?Math.round(ts/tp*100):0}%</div><div class="sc-s">consistency</div></div></div>`;
+  let h=`<div class="ph-title" style="margin-bottom:20px">PROGRAM OVERVIEW</div><div class="sg"><div class="sc"><div class="sc-l">Sessions</div><div class="sc-v">${ts}</div><div class="sc-s">of ${tp} possible</div></div><div class="sc"><div class="sc-l">Week</div><div class="sc-v">${curWeek}</div><div class="sc-s">of 52</div></div><div class="sc"><div class="sc-l">Phase</div><div class="sc-v">${getPhaseNum(curWeek)}</div><div class="sc-s">${getPhase(curWeek).n}</div></div><div class="sc"><div class="sc-l">Rate</div><div class="sc-v">${tp?Math.round(ts/tp*100):0}%</div><div class="sc-s">consistency</div></div></div>`;
   p.innerHTML=h}
 
 function renderPRs(){const p=document.getElementById('p-prs');const prs=getPRs();let h=`<div class="pr-title">PERSONAL RECORDS</div>`;
@@ -605,8 +475,8 @@ function renderPRs(){const p=document.getElementById('p-prs');const prs=getPRs()
   h+=`</select></div><div class="pr-fg"><label>Weight (lbs)</label><input type="number" id="prWeight" placeholder="0"></div><button class="pr-add" onclick="addPR()">UPDATE PR</button></div></div>`;p.innerHTML=h}
 function addPR(){const sel=document.getElementById('prSelect'),wt=document.getElementById('prWeight');if(sel&&wt&&wt.value){setPR(sel.value,parseInt(wt.value));renderPRs();renderStats()}}
 
-function renderAll(){const phase=getPhase(curWeek);document.getElementById('phaseTag').textContent=`Phase ${getPhaseNum(curWeek)} · Week ${curWeek}`;document.getElementById('weekLbl').textContent=`Week ${curWeek} / 35`;renderDayTabs();renderWorkout();renderPlan();renderStats();renderNutrition();renderPRs()}
+function renderAll(){const phase=getPhase(curWeek);document.getElementById('phaseTag').textContent=`Phase ${getPhaseNum(curWeek)} · Week ${curWeek}`;document.getElementById('weekLbl').textContent=`Week ${curWeek} / 52`;renderDayTabs();renderWorkout();renderPlan();renderStats();renderNutrition();renderPRs()}
 function nav(view){curView=view;document.querySelectorAll('.nav-tab').forEach(b=>b.classList.toggle('on',b.dataset.v===view));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));document.getElementById('p-'+view).classList.add('on');if(view==='today')renderWorkout()}
-function chgWeek(dir){curWeek=Math.min(Math.max(curWeek+dir,1),35);curDay=0;renderAll()}
+function chgWeek(dir){curWeek=Math.min(Math.max(curWeek+dir,1),52);curDay=0;renderAll()}
 async function startApp(){loadFromCache();const c=calcCurrentWeek();curWeek=c.week;curDay=c.day;updateClock();setInterval(updateClock,1000);renderAll();await loadFromSupabase();renderAll()}
 </script></body></html>
