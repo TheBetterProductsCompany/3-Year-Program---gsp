@@ -115,7 +115,7 @@
 <div id="login">
   <div class="l-pre">RELENTLESS PROTOCOL</div>
   <div class="l-title">RELENTLESS 42</div>
-  <div class="l-sub">52 WEEK PROTOCOL</div>
+  <div class="l-sub">28 WEEKS · FREAK OF NATURE</div>
   <input type="password" id="pw" placeholder="ENTER CODE" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
   <button class="l-btn" onclick="doLogin()">ACCESS</button>
   <div class="l-err" id="lerr">INCORRECT ACCESS CODE</div>
@@ -140,107 +140,139 @@ if(localStorage.getItem('r42auth')==='1'){document.getElementById('login').class
 
 const DAYS=['MON','TUE','WED','THU','FRI','SAT','SUN'];
 const DAYNAMES=['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY'];
-const TOTAL_WEEKS=52;
+const TOTAL_WEEKS=28;
+// June 15 2026 (Mon) → Dec 27 2026. 7 cycles × 4-week wave.
 const PHASES=[
-  {n:'RECONSTRUCTION',wks:[1,12],desc:'Patterns + base. 62-75%.'},
-  {n:'ACCUMULATION',wks:[13,24],desc:'Strength + engine. 68-82%.'},
-  {n:'CONVERSION',wks:[25,36],desc:'Strength to power. 73-90%.'},
-  {n:'EXPRESSION',wks:[37,52],desc:'Peak athleticism. 78-95%+.'},
+  {n:'RECONSTRUCTION',wks:[1,8],desc:'Patterns, springs, split base. 64-77%.'},
+  {n:'ACCUMULATION',wks:[9,16],desc:'Strength + engine. 70-84%.'},
+  {n:'CONVERSION',wks:[17,24],desc:'Strength → violence. Contrast pairs. 75-90%.'},
+  {n:'EXPRESSION',wks:[25,28],desc:'Peak. Express + TEST everything. 80-95%.'},
 ];
 function getPhase(w){return PHASES.find(p=>w>=p.wks[0]&&w<=p.wks[1])||PHASES[PHASES.length-1];}
 function getPhaseNum(w){return PHASES.findIndex(p=>w>=p.wks[0]&&w<=p.wks[1])+1;}
 function E(name,detail,note){return{name,detail,note:note||''};}
 
-function cycleNum(w){return Math.ceil(w/4);}
+function cycleNum(w){return Math.ceil(w/4);}        // 1-7
 function weekInCycle(w){return ((w-1)%4)+1;}
 function isReset(w){return weekInCycle(w)===4;}
 function isStab(w){return weekInCycle(w)===1;}
 function isPeak(w){return weekInCycle(w)===3;}
+function isA(w){return w%2===1;}                     // A/B week rotation
 function r5(n){return Math.round(n/5)*5;}
-function wavePct(w){const c=cycleNum(w);const base=68+(c-1)*(20/12);const wic=weekInCycle(w);if(wic===1)return base-6;if(wic===2)return base;if(wic===3)return base+7;return 60;}
+function wavePct(w){const c=cycleNum(w);const base=70+(c-1)*(18/6);const wic=weekInCycle(w);if(wic===1)return base-6;if(wic===2)return base;if(wic===3)return base+7;return 60;}
 function wt(rm,w){return r5(rm*wavePct(w)/100);}
-function repsP(w){const wic=weekInCycle(w);if(wic===1)return'5×3';if(wic===2)return'5×3';if(wic===3)return'6×2';return'4×3';}
+function repsP(w){const wic=weekInCycle(w);if(wic===3)return'6×2';if(wic===4)return'4×3';return'5×3';}
 function repsV(w){const wic=weekInCycle(w);if(wic===1)return'4×8';if(wic===2)return'4×6';if(wic===3)return'4×5';return'3×8';}
 function focusLabel(w){const wic=weekInCycle(w);if(wic===1)return'STABILIZER';if(wic===2)return'PROGRESSION';if(wic===3)return'PEAK';return'RESET';}
 
-const RM={bsquat:270,bench:315,row:230,gm:90,snatch:140,bss:280,stepup:135,cossack:145,slrdl:110,dbpress:88,pull:40,chin:60,dip:85,renegade:60};
+// VERIFIED MAXES (June 2026)
+const RM={bsquat:270,bench:315,row:230,gm:90,snatch:140,bss:280,stepup:135,cossack:145,slrdl:55,dbpress:88,pull:40,chin:60,dip:85,renegade:50};
 function LP(name,rm,w,note){return E(name,repsP(w)+' @ '+wt(rm,w)+' lbs',note||'');}
 function LV(name,rm,w,note){return E(name,repsV(w)+' @ '+wt(rm,w)+' lbs',note||'');}
-function primer(){return E('Primer (8 min)','Pogos + band walks + Arnold press + DB windmills + Copenhagen + Y+T + foot work','Springs, shoulders, adductor, feet. Coached.');}
 
-// ═══ AM CONDITIONING (hard runs Tue/Thu/Sat pair w/ upper-emphasis) ═══
+// THE FREAK PRIMER — every weights day, 8-10 min, coached
+function primer(w){return E('Primer (8-10 min)','Pogos 3×20 + SL pogos + band walks + Arnold/windmills + Copenhagen + Y+T + hip 90/90 + foot work','Springs, shoulders, adductor, hips, feet. This is treatment, not warmup.');}
+
+// ═══ AM CONDITIONING — hard runs Tue/Thu pair with upper days ═══
 function getCond(w,d){
-  const reset=isReset(w);const pl=reset?'quality':isPeak(w)?'peak':isStab(w)?'fundamental':'progression';
-  if(d===0)return{title:'SKI + POGOS',duration:'35 min',ex:[E('Ski Erg',reset?'15 min':'6×250m','Lats + core.'),E('Pogo Jumps + SL Pogos','3×20 + 2×10 each',pl),E('Foot + Toe Work','5 min','Extra L big toe.')]};
-  if(d===1)return{title:'RUN INTERVALS',duration:'40 min',ex:[E('Run — Intervals',(w<=12?'4':'6')+'×400m @ 85%','Threshold.'),E('Lateral Bounds','4×5 each (R first)',pl),E('Band Walks','3×15 each','Glute med.')]};
-  if(d===2)return{title:'ROW + BOUND',duration:'35 min',ex:[E('Row',reset?'15 min':'15-20 min','Posterior chain.'),E('Knee→Feet→90° Rotational Bound','4×4 each',pl+' — explosive rotation.'),E('Pogo Jumps','3×20',pl)]};
-  if(d===3)return{title:'RUN TEMPO',duration:'35 min',ex:[E('Run — Tempo',reset?'20 min':'25-30 min Z2-Z3','Threshold base.'),E('SL Pogo Jumps + Skipping','3×12 each + 5 min',pl),E('Band Walks','3×15 each','Glute med.')]};
-  if(d===4)return{title:'EASY + THROW',duration:'30 min',ex:[E('Ski or Row',reset?'15 min':'15-20 min easy','Recovery.'),E('Lateral Ball Throw','4×5 each','Rotational power.'),E('Pogo Jumps','3×20',pl)]};
-  if(d===5)return{title:'LONG RUN',duration:'45-55 min',ex:[E('Run — Long',reset?'25 min':'40-50 min Z2','Aerobic base. Negative split.'),E('Skipping','10 min','Calf + rhythm.'),E('Foot + Toe Work','5 min','Barefoot.')]};
+  const reset=isReset(w);const ph=getPhaseNum(w);
+  const pl=reset?'quality only':isPeak(w)?'PEAK — max intent':isStab(w)?'fundamental':'progression';
+  if(d===0)return{title:'SKI + SPRINGS',duration:'35 min',ex:[
+    E('Ski Erg',reset?'15 min easy':'6×250m','Lats + core.'),
+    E('Pogo Jumps + SL Pogos','3×20 + 2×10 each',pl),
+    E('Foot + Toe Work','5 min','Barefoot. Extra L big toe.')]};
+  if(d===1)return{title:'RUN INTERVALS',duration:'40 min',ex:[
+    E('Run — Intervals',(ph<=1?'4':ph===2?'6':'8')+'×400m @ 85%','Threshold. Sub-70s by Dec.'),
+    E('Lateral Bounds','4×5 each (R first)',pl),
+    E('Band Walks','3×15 each','Glute med.')]};
+  if(d===2)return{title:'ROW + ROTATION BOUND',duration:'35 min',ex:[
+    E('Row',reset?'15 min':'15-20 min @ '+(ph<=2?'1:45':'1:40')+'/500m','Posterior chain.'),
+    E('Knee→Feet→90° Rotational Bound','4×4 each',pl+' — explosive rotation.'),
+    E('Pogo Jumps','3×20',pl)]};
+  if(d===3)return{title:'RUN TEMPO',duration:'35 min',ex:[
+    E('Run — Tempo',reset?'20 min easy':'25-30 min Z2-Z3','Threshold base.'),
+    E('SL Pogo Jumps + Skipping','3×12 each + 5 min',pl),
+    E('Band Walks','3×15 each','Glute med.')]};
+  if(d===4)return{title:'EASY + THROW',duration:'30 min',ex:[
+    E('Ski or Row',reset?'15 min':'15-20 min easy','Recovery pace. KEEP IT EASY.'),
+    E('Lateral Ball Throw','4×5 each','Rotational power.'),
+    E('Pogo Jumps','3×20',pl)]};
+  if(d===5)return{title:'LONG RUN',duration:'45-55 min',ex:[
+    E('Run — Long',reset?'25 min Z2':(ph<=2?'40-50':'50-60')+' min Z2','Aerobic base. Negative split.'),
+    E('Skipping','10 min','Calf elasticity + rhythm.'),
+    E('Foot + Toe Work','5 min','Barefoot.')]};
   return{title:'OFF',duration:'—',ex:[E('OFF','Rest.','')]};
 }
 
 // ═══ AM WEIGHTS — SNAKE / GORILLA / PANTHER ═══
+// SNATCH: WED + SAT ONLY (3 days apart — collision fixed)
+// A/B week rotation covers full library without weekly bloat
 function getWeights(w,d){
-  const reset=isReset(w);
-  if(d===0)return{title:'🦍 GORILLA',main:[ primer(),
-    LP('Back Squat',RM.bsquat,w,'POWER. Move weight. 2s pause.'),
+  const reset=isReset(w);const A=isA(w);const ph=getPhaseNum(w);
+  if(d===0)return{title:'🦍 GORILLA',main:[ primer(w),
+    LP('Back Squat',RM.bsquat,w,ph>=3?'POWER. Contrast: 3 box jumps 10s after each set.':'POWER. 2s pause.'),
     LV('Flat Bench',RM.bench,w,'HEAVY.'),
-    LV('Pendlay Rows',RM.row,w,'Dead stop.'),
-    LV('Good Mornings',RM.gm,w,'Bilateral hinge. Brace.'),
-    E('DB Shoulder Press',repsV(w)+' @ '+wt(RM.dbpress,w)+' ea','Vertical push. L matches R.')]};
-  if(d===1)return{title:'🐆 PANTHER',main:[ primer(),
-    LV(w%2===1?'Front Rack BSS':'Back BSS',RM.bss,w,'R first.'),
-    LV('Step-up → Reverse Lunge',RM.stepup,w,'R first +1 set.'),
-    E('Renegade Rows',repsV(w)+' each','Pull + anti-rotation.'),
-    E('Dips',repsV(w)+(w>12?' (weighted)':' BW'),'Vertical push.'),
+    LV('Pendlay Rows',RM.row,w,'Dead stop. Violent off floor.'),
+    A?LV('Good Mornings',RM.gm,w,'Bilateral hinge. Brace.'):E('BB Hip Thrust',repsV(w)+' @ '+wt(280,w)+' lbs','Glute force. 2s squeeze.'),
+    E('DB Shoulder Press',repsV(w)+' @ '+wt(RM.dbpress,w)+' ea','L matches R.')]};
+  if(d===1)return{title:'🐆 PANTHER',main:[ primer(w),
+    LV('Front Rack BSS',RM.bss,w,'R first +1 set R.'),
+    LV('Step-up → Reverse Lunge',RM.stepup,w,'R first. Control the descent.'),
+    E('Renegade Rows',repsV(w)+' each @ '+RM.renegade+' DB','Pull + anti-rotation.'),
+    E('Weighted Dips',repsV(w)+' @ +'+wt(RM.dip,w)+' lbs','Vertical push.'),
     LV('Cossack Squat',RM.cossack,w,'R first. Adductors.')]};
-  if(d===2)return{title:'🐍 SNAKE',main:[ primer(),
-    isPeak(w)?E('Snatch','heavy triple @ ~'+wt(RM.snatch,w),'POWER.'):LP('Snatch',RM.snatch,w,'POWER. Technical.'),
-    E('Rotational Jump Squat','4×4 each','Land soft, floor. Rotational power.'),
-    E('Rings','15-20 min','Levers, muscle-ups, L-sits.'),
-    E('TGU','2×3 each (R bias)','Full-body rotation.'),
-    E('Cable Chops + Squeeze Ball Rotation','3×8 each + 3×10','Golf swing pattern + segmental rotation.')]};
-  if(d===3)return{title:'🦍 GORILLA 2',main:[ primer(),
-    LV('Back Squat',RM.bsquat,w,'VOLUME. Tempo.'),
-    LP('Flat Bench',RM.bench,w,'POWER.'),
-    E('Pull-ups / Chin-ups',repsV(w)+' @ +'+wt(RM.pull,w)+' lbs','Alternate grip weekly.'),
-    isPeak(w)?E('Snatch','heavy double @ ~'+wt(RM.snatch,w),'POWER.'):LP('Snatch',RM.snatch,w,'POWER.'),
-    E('DB Shoulder Press',repsP(w)+' @ '+wt(RM.dbpress,w)+' ea','Vertical push.')]};
-  if(d===4)return{title:'🐆 PANTHER 2',main:[ primer(),
-    LV('Cossack Squat',RM.cossack,w,'R first.'),
-    LV('SL-RDL',RM.slrdl,w,'R first. Unilateral hinge + balance.'),
-    E('Renegade Rows',repsV(w)+' each','Pull + anti-rotation.'),
-    E('Nordic Curls',repsV(w)+(isStab(w)?' (band)':''),'Eccentric. Lower slow.'),
+  if(d===2)return{title:'🐍 SNAKE',main:[ primer(w),
+    isPeak(w)?E('Snatch','work to heavy triple ~'+wt(RM.snatch,w)+' lbs','POWER. Technical max — form breaks = max.'):LP('Snatch',RM.snatch,w,'SNATCH DAY 1. Technical. Full extension.'),
+    E('Rotational Jump Squat','4×4 each','Land soft, on floor. Rotational power.'),
+    E('Rings','15-20 min','Levers, muscle-ups, L-sits, skin the cats.'),
+    E('TGU','2×3 each (R bias)','Full-body rotation control.'),
+    A?E('Cable Chops + Squeeze Ball Rotation','3×8 each + 3×10','Golf swing pattern + segmental rotation.'):E('Lateral Med Ball Slams + Squeeze Ball','4×5 each + 3×10','Rotational violence + control.')]};
+  if(d===3)return{title:'🦍 GORILLA 2',main:[ primer(w),
+    LV('Back Squat',RM.bsquat,w,'VOLUME. Tempo 3-1-1.'),
+    LP('Flat Bench',RM.bench,w,ph>=3?'POWER. Contrast: 5 plyo pushups 10s after each set.':'POWER.'),
+    E('Pull-ups / Chin-ups',repsV(w)+' @ +'+wt(A?RM.pull:RM.chin,w)+' lbs',A?'Pronated this week.':'Supinated this week.'),
+    A?E('BB Hip Thrust',repsV(w)+' @ '+wt(280,w)+' lbs','Glute force.'):LV('Good Mornings',RM.gm,w,'Hinge. Brace hard.'),
+    E('DB Shoulder Press',repsP(w)+' @ '+wt(RM.dbpress,w)+' ea','POWER. Drive.')]};
+  if(d===4)return{title:'🐆 PANTHER 2',main:[ primer(w),
+    LV('Cossack Squat',RM.cossack,w,'R first. Own the bottom.'),
+    E('SL-RDL',repsV(w)+' @ '+RM.slrdl+' DB each','R first. Balance + hinge.'),
+    E('Renegade Rows',repsV(w)+' each @ '+RM.renegade+' DB','Pull + anti-rotation.'),
+    E('Nordic Curls',repsV(w)+(isStab(w)?' (band)':''),'Eccentric. Lower slow. Earn full ROM by Dec.'),
     LV('Step-up → Reverse Lunge',RM.stepup,w,'VOLUME. R first.')]};
-  if(d===5)return{title:'🐍 SNAKE 2',main:[ primer(),
-    E('Knee→Feet→90° Rotational Bound','4×4 each','Explosive rotation. Golf-athletic.'),
-    E('TGU-prone → Cable Rotation Pull','3×6 each','Chest fly / push off trail leg. Advanced rotational chain.'),
-    E('Squeeze Ball Rotation','3×10 each','Segmental rotation + pelvic control.'),
-    E('Lateral Med Ball Slams','4×5 each','Rotational power.'),
+  if(d===5)return{title:'🐍 SNAKE 2',main:[ primer(w),
+    isPeak(w)?E('Snatch','work to heavy double ~'+wt(RM.snatch,w)+' lbs','SNATCH DAY 2. Technical max.'):LP('Snatch',RM.snatch,w,'SNATCH DAY 2. Speed + position.'),
+    E('Knee→Feet→90° Rotational Bound','4×4 each','Explosive rotation.'),
+    A?E('TGU-prone → Cable Rotation Pull','3×6 each','Chest fly / push off trail leg.'):E('Cable Chops','3×8 each','Slow eccentric = deceleration.'),
+    E('Lateral Med Ball Slams','4×5 each','Max intent.'),
     E('Rings','15 min','Skill + shoulder health.')]};
   return{title:'RECOVERY',main:[E('Rest','Full recovery.','')]};
 }
 
-function getEvening(d){
-  const notes=['Yin.','Vinyasa.','T-spine + shoulders.','Deep hips.','Yin.','Full mobility.'];
-  if(d===6)return{title:'OFF',focus:'Off',duration:'—',options:[E('Cold Plunge','5-10 min','Recovery.'),E('Mobility Flow','15 min','R hip + L shoulder. Kneeling T-spine opener, reverse crab.')]};
-  return{title:'YOGA',focus:'Yoga',duration:'50-60 min',options:[E('Yoga','PM',notes[d])]};
+// ═══ PM YOGA + DAILY SPLITS PROTOCOL (tier-1 mobility mission) ═══
+function getEvening(w,d){
+  const ph=getPhaseNum(w);
+  const splitHold=ph===1?'3×45s':ph===2?'3×60s':ph===3?'4×60s':'4×75s';
+  const splits=E('SPLITS PROTOCOL','Forward '+splitHold+' each + Lateral '+splitHold,'DAILY. Progress ~1cm/week. Full splits both planes by Dec. Warm only.');
+  const t=E('Hip 90/90 + T-Spine Opener','2 min each + 10 each side',ph>=3?'Loaded 90/90 (5lb).':'The golf separation engine.');
+  const notes=['Yin. Deep recovery.','Vinyasa.','T-spine + shoulders.','Deep hips.','Yin.','Full body.'];
+  if(d===6)return{title:'RECOVERY',focus:'Off',duration:'40 min',options:[E('Cold Plunge','5-10 min',''),splits,t,E('Reverse Crab + Back Bridge','3×8 + 3×20s','Anterior opening.')]};
+  return{title:'YOGA + SPLITS',focus:'Yoga',duration:'60-70 min',options:[E('Yoga','50-60 min',notes[d]),splits,t]};
 }
 
 function getDayData(w,d){
   if(d===6){
-    return{run:{title:'RECOVERY',focus:'Cold Plunge + Mobility',duration:'40 min',exercises:[E('Cold Plunge','5-10 min',''),E('Skipping','10 min easy','Light calf.'),E('Kneeling T-Spine Opener + Reverse Crab','10 min','Thoracic + anterior opening.'),E('Foot + Toe Work','5 min','')]},
+    const e=getEvening(w,6);
+    return{run:{title:'RECOVERY',focus:'Cold + Mobility',duration:'40 min',exercises:[E('Cold Plunge','5-10 min',''),E('Skipping','10 min easy','Light.'),E('Splits + Hip 90/90 + T-spine','20 min','The mobility mission. Daily.'),E('Foot + Toe Work','5 min','')]},
       am:{title:'RECOVERY',focus:'Rest',duration:'',conditioning:[],core:[],rings:[]},
-      pm:{title:'RECOVERY',focus:'Rest',duration:'',prep:[],iso:[],main:[E('Rest','Full recovery.','')],conditioning:[]},
-      eve:getEvening(6)};
+      pm:{title:'RECOVERY',focus:'Rest',duration:'',prep:[],iso:[],main:[E('Rest','Full recovery. The freak is built on Sundays.','')],conditioning:[]},
+      eve:e};
   }
   const c=getCond(w,d);const wts=getWeights(w,d);
   return{
     run:{title:c.title,focus:'Conditioning + Plyo',duration:c.duration,exercises:c.ex},
     am:{title:wts.title,focus:focusLabel(w),duration:'',conditioning:[],core:[],rings:[]},
     pm:{title:wts.title,focus:focusLabel(w),duration:'60-75 min',prep:[],iso:[],main:wts.main,conditioning:[]},
-    eve:getEvening(d)
+    eve:getEvening(w,d)
   };
 }
 
@@ -314,7 +346,7 @@ function calcCurrentWeek(){
     const parts=key.split('_');const wk=parseInt(parts[0]),dy=parseInt(parts[1]);
     if(wk>maxWeek){maxWeek=wk;maxDay=dy;}else if(wk===maxWeek&&dy>maxDay){maxDay=dy;}
   }
-  if(!anyDone)return{week:5,day:0};
+  if(!anyDone)return{week:1,day:0};
   // training days are Mon-Sat (0-5). If all 6 done, advance to next week.
   const allDone=[0,1,2,3,4,5].every(d=>comp[maxWeek+'_'+d]);
   if(allDone&&maxWeek<52)return{week:maxWeek+1,day:0};
@@ -329,7 +361,7 @@ function renderWorkout(){
   const p=document.getElementById('p-today');const data=getDayData(curWeek,curDay);if(!data){p.innerHTML='<div style="padding:40px;color:var(--text-tertiary)">No data.</div>';return}
   let h='';const am=data.am,pm=data.pm,phase=getPhase(curWeek);
   h+=`<div class="dh-code">W${curWeek} — ${DAYNAMES[curDay]}</div>`;
-  h+=`<div class="dh-meta"><div class="dh-m"><div class="dh-m-l">Phase</div><div class="dh-m-v">${phase.n}</div></div><div class="dh-m"><div class="dh-m-l">Week</div><div class="dh-m-v">${curWeek} / 52</div></div></div>`;
+  h+=`<div class="dh-meta"><div class="dh-m"><div class="dh-m-l">Phase</div><div class="dh-m-v">${phase.n}</div></div><div class="dh-m"><div class="dh-m-l">Week</div><div class="dh-m-v">${curWeek} / 28</div></div></div>`;
   
   h+=`<div style="display:flex;gap:8px;margin:20px 0;">`;
   h+=`<button id="runBtn" onclick="toggleBlock('run')" style="flex:1;padding:14px 6px;background:var(--surface);border:1px solid var(--glass-border);border-radius:var(--radius);color:var(--text);font-family:'LEMON MILK',sans-serif;font-size:9px;letter-spacing:2px;cursor:pointer;transition:all .25s;">COND</button>`;
@@ -477,7 +509,7 @@ function markComplete(){const done=!isComplete(curWeek,curDay);setCompletion(cur
 function renderPlan(){const p=document.getElementById('p-plan');let h='';PHASES.forEach((ph,pi)=>{h+=`<div style="margin-bottom:28px"><div class="ph-title">Phase ${pi+1} — ${ph.n}</div><div class="ph-desc">${ph.desc}</div>`;for(let w=ph.wks[0];w<=ph.wks[1];w++){const isCur=w===curWeek;const allDone=[0,1,2,3,4,5,6].every(d=>isComplete(w,d));h+=`<div class="pw-row${isCur?' cur':''}" onclick="curWeek=${w};curDay=0;nav('today')"><div class="pw-num">Week ${w}</div><div class="pw-focus">${ph.n}</div><div class="pw-status">${allDone?'✓ COMPLETE':isCur?'CURRENT':'—'}</div></div>`}h+=`</div>`});p.innerHTML=h}
 
 function renderStats(){const p=document.getElementById('p-stats');const prs=getPRs();const comp=getCompletions();const ts=Object.keys(comp).filter(k=>comp[k]).length;const tp=curWeek*7;
-  let h=`<div class="ph-title" style="margin-bottom:20px">PROGRAM OVERVIEW</div><div class="sg"><div class="sc"><div class="sc-l">Sessions</div><div class="sc-v">${ts}</div><div class="sc-s">of ${tp} possible</div></div><div class="sc"><div class="sc-l">Week</div><div class="sc-v">${curWeek}</div><div class="sc-s">of 52</div></div><div class="sc"><div class="sc-l">Phase</div><div class="sc-v">${getPhaseNum(curWeek)}</div><div class="sc-s">${getPhase(curWeek).n}</div></div><div class="sc"><div class="sc-l">Rate</div><div class="sc-v">${tp?Math.round(ts/tp*100):0}%</div><div class="sc-s">consistency</div></div></div>`;
+  let h=`<div class="ph-title" style="margin-bottom:20px">PROGRAM OVERVIEW</div><div class="sg"><div class="sc"><div class="sc-l">Sessions</div><div class="sc-v">${ts}</div><div class="sc-s">of ${tp} possible</div></div><div class="sc"><div class="sc-l">Week</div><div class="sc-v">${curWeek}</div><div class="sc-s">of 28</div></div><div class="sc"><div class="sc-l">Phase</div><div class="sc-v">${getPhaseNum(curWeek)}</div><div class="sc-s">${getPhase(curWeek).n}</div></div><div class="sc"><div class="sc-l">Rate</div><div class="sc-v">${tp?Math.round(ts/tp*100):0}%</div><div class="sc-s">consistency</div></div></div>`;
   p.innerHTML=h}
 
 function renderPRs(){const p=document.getElementById('p-prs');const prs=getPRs();let h=`<div class="pr-title">PERSONAL RECORDS</div>`;
@@ -487,8 +519,8 @@ function renderPRs(){const p=document.getElementById('p-prs');const prs=getPRs()
   h+=`</select></div><div class="pr-fg"><label>Weight (lbs)</label><input type="number" id="prWeight" placeholder="0"></div><button class="pr-add" onclick="addPR()">UPDATE PR</button></div></div>`;p.innerHTML=h}
 function addPR(){const sel=document.getElementById('prSelect'),wt=document.getElementById('prWeight');if(sel&&wt&&wt.value){setPR(sel.value,parseInt(wt.value));renderPRs();renderStats()}}
 
-function renderAll(){const phase=getPhase(curWeek);document.getElementById('phaseTag').textContent=`Phase ${getPhaseNum(curWeek)} · Week ${curWeek}`;document.getElementById('weekLbl').textContent=`Week ${curWeek} / 52`;renderDayTabs();renderWorkout();renderPlan();renderStats();renderNutrition();renderPRs()}
+function renderAll(){const phase=getPhase(curWeek);document.getElementById('phaseTag').textContent=`Phase ${getPhaseNum(curWeek)} · Week ${curWeek}`;document.getElementById('weekLbl').textContent=`Week ${curWeek} / 28`;renderDayTabs();renderWorkout();renderPlan();renderStats();renderNutrition();renderPRs()}
 function nav(view){curView=view;document.querySelectorAll('.nav-tab').forEach(b=>b.classList.toggle('on',b.dataset.v===view));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));document.getElementById('p-'+view).classList.add('on');if(view==='today')renderWorkout()}
-function chgWeek(dir){curWeek=Math.min(Math.max(curWeek+dir,1),52);curDay=0;renderAll()}
+function chgWeek(dir){curWeek=Math.min(Math.max(curWeek+dir,1),28);curDay=0;renderAll()}
 async function startApp(){loadFromCache();let c=calcCurrentWeek();curWeek=c.week;curDay=c.day;updateClock();setInterval(updateClock,1000);renderAll();await loadFromSupabase();c=calcCurrentWeek();curWeek=c.week;curDay=c.day;renderAll()}
 </script></body></html>
