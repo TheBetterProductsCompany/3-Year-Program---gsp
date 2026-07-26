@@ -142,12 +142,12 @@ if(localStorage.getItem('r42auth')==='1'){document.getElementById('login').class
 
 const DAYS=['MON','TUE','WED','THU','FRI','SAT','SUN'];
 const DAYNAMES=['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY'];
-const TOTAL_WEEKS=38; // Mon Jul 20 2026 -> Madrid race week Mar 2027
+const TOTAL_WEEKS=38;
 const PHASES=[
-  {n:'BASE',wks:[1,12],desc:'Engine leads. Volume climbs. Sims at 6x1km. Jul-Sep.'},
-  {n:'BUILD',wks:[13,24],desc:'Full 8x1km sims weekly. Station volume climbs. Oct-Dec.'},
-  {n:'SPECIFIC',wks:[25,34],desc:'Race pace everything. Double weak stations. Jan-Feb.'},
-  {n:'PEAK',wks:[35,38],desc:'Taper. Volume -40-50%, intensity stays. Arrive fresh. Mar.'},
+  {n:'BASE',wks:[1,12],desc:'Engine + one-unit rebuild. Corrections 4 sets. Sims 6x1km.'},
+  {n:'BUILD',wks:[13,24],desc:'Sims 8x1km. Loads climb. Wall balls toward 100 unbroken.'},
+  {n:'SPECIFIC',wks:[25,34],desc:'Race pace. Corrections 2. Elite tier sharpens.'},
+  {n:'PEAK',wks:[35,38],desc:'Taper. Full rehearsals wk36-37. Openers wk38. Madrid.'},
 ];
 function getPhase(w){return PHASES.find(p=>w>=p.wks[0]&&w<=p.wks[1])||PHASES[PHASES.length-1];}
 function getPhaseNum(w){return PHASES.findIndex(p=>w>=p.wks[0]&&w<=p.wks[1])+1;}
@@ -156,104 +156,115 @@ function weekInCycle(w){return ((w-1)%4)+1;}
 function isDeload(w){return weekInCycle(w)===4&&getPhaseNum(w)<4;}
 function isPeakPhase(w){return getPhaseNum(w)===4;}
 function r5(n){return Math.round(n/5)*5;}
-function corrSets(w){const p=getPhaseNum(w);return p===1?'4':p===2?'3':p===3?'2':'2';} // correction front-loaded: BASE 4, BUILD 3, SPECIFIC/PEAK 2
 function focusLabel(w){if(isPeakPhase(w))return'TAPER';const wic=weekInCycle(w);if(wic===1)return'BUILD';if(wic===2)return'PROGRESS';if(wic===3)return'PEAK';return'DELOAD';}
-
-// ═══ CURRENT NUMBERS (Jul 2026) ═══
-// 5K 19:59 (4:00/km) · 10K 48:34 · Snatch 165 · Clean 225 · FSq 240 (225x3) · Dips +115 · Pull +50 · Chin +65
-const RM={front:240,zercher:200,bss:180,snatch:165,clean:225,dip:115,pull:50,chin:65,stepup:145};
-// Strength maintains: 70-78% band all year, small wave
-function liftPct(w){if(isDeload(w))return 62;if(isPeakPhase(w))return 68;const wic=weekInCycle(w);return 70+(wic-1)*4;} // 70/74/78/62
+const RM={front:240,snatch:165,clean:225,dip:115,pull:50,chin:65,stepup:145,cossack:140,incline:90};
+function liftPct(w){if(isDeload(w))return 62;if(isPeakPhase(w))return 68;const wic=weekInCycle(w);return 70+(wic-1)*4;}
 function lw(rm,w){return r5(rm*liftPct(w)/100);}
-// Run paces progress by phase: threshold 4:00 -> 3:45; race-km target 4:10 -> 3:55; easy stays easy
+function corrSets(w){const p=getPhaseNum(w);return p===1?'4':p===2?'3':'2';}
 function paceThresh(w){const p=getPhaseNum(w);return p===1?'3:55-4:00':p===2?'3:50-3:55':'3:45-3:50';}
 function paceSimKm(w){const p=getPhaseNum(w);return p===1?'4:10-4:15':p===2?'4:05-4:10':'3:55-4:05';}
 function simReps(w){const p=getPhaseNum(w);if(p===1)return 6;if(isPeakPhase(w))return(w>=37?4:6);return 8;}
 function easyVol(w){const p=getPhaseNum(w);if(isPeakPhase(w))return'6-7km easy';if(isDeload(w))return'7-8km easy';return p===1?'10km easy':p===2?'11-12km easy':'12km easy';}
+// Wall-ball unbroken project: 40 -> 100 by SPECIFIC phase
+function wbTarget(w){const t=40+Math.floor((w-1)*2);return Math.min(t,100);}
+// Daily calves+tibs (maintenance vs main dose)
+function calvesDaily(main){return main?E('BB Calf Raises × KB Tibs (MAIN)','4×15 + 3×20','Full stretch, 1s pause. Daily law — main dose today.'):E('Calves × Tibs (daily dose)','2×15 + 2×20','The everyday law. Never skipped.');}
 
-// ═══ AM / MAIN SESSION ═══
 function getSession(w,d){
-  const ph=getPhaseNum(w);const dl=isDeload(w);const tp=isPeakPhase(w);
+  const dl=isDeload(w), tp=isPeakPhase(w), ph=getPhaseNum(w);
+
   if(d===0)return{title:'RACE SIMULATION',main:[
-    E('Compromised Run Complex',simReps(w)+'×1km @ '+paceSimKm(w)+'/km','THE session. Station between every rep.'),
-    E('Stations (rotate 2-3)','Sled push 20m · Sled pull 20m · DB lunges 20m · Wall balls 20 · Burpee broad jumps 10','Race movements only. Transitions count — practice them fast.'),
-    E('Farmers Carry','2×200m heavy','Station 7. Grip + trunk. No setdowns goal.'),
-    dl?E('DELOAD','Cut to 4×1km, 2 stations','Scheduled, not felt. This is what lets the other 3 weeks be violent.'):E('Log every rep time','—','What gets measured gets fixed.'),
-    (w%6===0?E('⚡ TESTING GATE','5K TT · sim time · FSq triple · bodyweight','Every 6 weeks the data referees. Gates decide the block, not the debate.'):E('Pain rules','Sharp/joint = stop today. Ache that worsens = 2wk modified.','Agreed while healthy. Followed always.'))]};
-  if(d===1){
-    const oly=ph<=2?[E('Snatch + Power Clean (technical dose)','3×2 each @ '+r5(RM.snatch*0.68)+' / '+r5(RM.clean*0.68)+' lbs','CAPPED primer, ~12 min. Bar speed + positions only. If Monday wrecked you: empty bar or skip — the sim outranks this.')]
-      :ph===3?[E('Power Clean (technical dose)','3×2 @ '+r5(RM.clean*0.68)+' lbs','SPECIFIC phase: clean only. Snatch lives on Saturday.')]
-      :[];
-    return{title:'UPPER STRENGTH + SKI',main:[...oly,
-    E('Alternating Incline DB Press',dl?'3×8':'4×6','Push anchor.'),
-    E('Weighted Pull-ups',(dl?'3×6':'4×6')+' @ +'+lw(RM.pull,w)+' lbs','Alt chin-ups (+'+lw(RM.chin,w)+') odd weeks.'),
-    E('Weighted Dips',(dl?'3×8':'4×8')+' @ +'+lw(RM.dip,w)+' lbs','Vertical push.'),
-    E('Alternating DB Gorilla Rows',dl?'3×8':'4×8 each','Hinge-position pull.'),
-    E('Renegade Rows + Explosive Pushups','3×8 each + 3×6','Anti-rotation + speed.'),
-    E('SKI ERG','6×250m hard (90s rest)','STATION 1 of the race. Weekly, no exceptions.'),
-    E('Handstands','8-10 min practice','Shoulder skill + balance.')]};}
-  if(d===2)return{title:'THRESHOLD + KNEE BLOCK',main:[
-    E('Run Intervals',(dl?'3':'5')+'×1km @ '+paceThresh(w)+'/km (2min rest)','Speed lives here now — your last fresh day before bar nights.'),
-    E('Plyo (short)','Lateral Bounds 4×5 each · DB Pogos 3×20','Crisp, elastic. Quality only.'),
-    E('Leg Press',corrSets(w)+'×10-12','QUAD REBUILD. Hips cannot hijack this. Feet low.'),
-    E('Hamstring Curl',corrSets(w)+'×10-12','Knee-flexion — the neglected function. Slow eccentric.'),
-    E('Backward Sled Drag × ISO Wall Sit','4×20m + 3×45-60s (superset)','Quad endurance = sled push prep.'),
-    E('Leg Press Calf Raise','4×12 deficit, paused stretch','Loaded lengthening for tight calves.')]};
-  if(d===3)return{title:'EASY ENGINE — BAR NIGHT',main:[
-    E('Easy Run',easyVol(w),'CONVERSATIONAL. Bar shift tonight — nothing heavy today. The engine is built at easy pace, week after week.'),
-    E('Core (light)','TGU 3×3 each · Copenhagens 3×20s each','Short trunk dose.'),
-    E('Barbell Calves x KB Tibs','4×15 + 3×20','Full stretch, 1s pause bottom.'),
-    E('SL Calf Raise off Step','3×8 each, slow','Achilles-proofing before the kms climb.'),
-    E('Pre-shift mobility','Full 11-protocol before work','Loosen before 6 hours standing.')]};
+    E('Compromised Run Complex',(dl?'4':simReps(w))+'×1km @ '+paceSimKm(w)+'/km','THE session. Station between every rep.'),
+    E('Stations (rotate 2-3)','Sled push · Sled pull · Sandbag shoulder→lunge 20m · DB lunges','Sandbag shouldering = station 7 + rotation + trunk in one.'),
+    E('WALL BALL PROJECT','1 max unbroken set — target '+wbTarget(w)+' reps','The elite gap. 100 unbroken by January.'),
+    E('Burpee Broad Jumps','2×10 crisp','The other elite gap.'),
+    E('Farmers Carry','2×200m heavy','Core under fatigue. No setdowns.'),
+    calvesDaily(false),
+    (w%6===0?E('⚡ TESTING GATE','5K TT · sim time · FSq triple · BW · wall-ball max','Data referees.'):E('Pain rules','Sharp = stop today. Worsening = 2wk modified.',''))]};
+
+  if(d===1)return{title:'POWER + ELITE TIER + PILATES',main:[
+    E('Snatch',(dl?'4×2':'5×2')+' @ '+lw(RM.snatch,w)+' lbs','Crisp. Never grind.'),
+    E('Power Clean',(dl?'4×2':'5×2')+' @ '+lw(RM.clean,w)+' lbs','Violent hips.'),
+    E('ELITE: KB OH Press → Box Step-Up','3×4 each side','Single KB overhead, one leg planted, step. Skill-strength — full rest, quality only.'),
+    E('ELITE: KB Rotational Clean','3×5 each side','Rotate, catch, stand. The loaded golf swing.'),
+    E('Weighted Pull-ups × Dips','4×6 @ +'+lw(RM.pull,w)+' / 4×8 @ +'+lw(RM.dip,w),'Superset. The anchors.'),
+    E('Incline DB Press + Straight-Leg Arnold Press','4×6 + 3×10','Press + true thoracic opening.'),
+    E('DB/KB Gorilla Rows','4×8 each','Hinge-position pull.'),
+    E('SKI ERG','6×250m, under 38 s/m','Station 1.'),
+    E('PILATES SHORT (15 min)','Hundred · Dead Bugs 3×8 · Copenhagens 3×20s · Ab Roller 3×8','Breath-led. The one-unit rebuild, dose 1.'),
+    E('Handstands','8 min','Overhead control.'),
+    calvesDaily(false)]};
+
+  if(d===2)return{title:'THRESHOLD + LEGS + KNEE INSURANCE',main:[
+    E('Run Intervals',(dl?'3':'5')+'×1km @ '+paceThresh(w)+'/km (2min rest)','EVEN SPLITS. Sit in the pace.'),
+    E('Plyo (short)','Pogos 3×20 · Lateral Bounds 4×5 each','Crisp, elastic.'),
+    E('Front Squat',(dl?'3×3':'4×3')+' @ '+lw(RM.front,w)+' lbs','Knee-forward. Quads lead.'),
+    E('Leg Extension',corrSets(w)+'×10-12 (3s ecc)','Patellar tendon medicine.'),
+    E('Hamstring Curl',corrSets(w)+'×10-12','Knee-flexion, slow eccentric.'),
+    E('Backward Sled Drag × ISO Wall Sit','4×20m + 3×45-60s','Sled push prep.'),
+    calvesDaily(true),
+    E('PM: YOGA FLOW (20 min)','Hips · hamstrings · t-spine','Unwind the intervals. Breath over depth.')]};
+
+  if(d===3)return{title:'EASY ENGINE + FULL PILATES — BAR NIGHT',main:[
+    E('Easy Run',easyVol(w),'CONVERSATIONAL. The 43-min 10K is built here.'),
+    E('FULL PILATES MAT (30 min)','Hundred · Roll-ups · Leg circles · Series of Five · E-BALL STEAMROLLERS 3×45s · Swimming · Side series · Teasers','The deepest one-unit work of the week. Breath leads everything.'),
+    E('Hanging Leg Raises + Sit-up Ball Throw','3×10 + 3×10','Anti + dynamic trunk.'),
+    E('SL Calf Raise off Step','3×8 each, slow','Achilles-proofing.'),
+    calvesDaily(true),
+    E('Pre-shift mobility','Full protocol before work','6 hours standing ahead.')]};
+
   if(d===4)return{title:'FLEX DAY — READINESS DECIDES',main:[
-    E('MORNING CHECK FIRST','RHR + sleep hours + feel 1-5','Post-bar night. The check decides today, not the plan.'),
-    E('GREEN → Short Row Complex','3×1km row × 10 burpee broad jumps × 15 wall balls','30-40 min, done. Stations 5+4+8 rehearsed.'),
-    E('GREEN → Rotation Core','Med Ball Slams 3×8 · Squeeze Ball Cable Chop 3×8 each','Only if green.'),
-    E('RED (RHR +5 / slept <6h) → Recovery only','Full 11-mobility + easy 20min walk','Skipping today costs nothing. Grinding it costs the week.'),
+    E('MORNING CHECK FIRST','RHR + sleep + feel 1-5','Post-bar night. The check decides.'),
+    E('GREEN → Row Complex','3×1km row × 10 burpee broad jumps × 15 wall balls','Stations rehearsed, 30-40 min.'),
+    E('GREEN → Core','Cable Chops 3×8 each · Weighted Dead Bug 3×8 each','Rotation + anti dose.'),
+    E('RED → YIN YOGA (25 min)','Long holds — hips, spine + easy 20min walk','Guilt-free. Recovery IS the program today.'),
+    calvesDaily(false),
     E('Pre-shift','Splits only tonight','Bar night 2 of 3.')]};
-  if(d===5)return{title:'POWER + HALF-SIM (75 MIN CAP)',main:[
-    E('Snatch',(dl||tp?'4×2':'5×2')+' @ '+lw(RM.snatch,w)+' lbs','Crisp. Never grind. Power preserves the snap.'),
-    E('Power Clean',(dl||tp?'4×2':'5×2')+' @ '+lw(RM.clean,w)+' lbs','Violent hips.'),
-    E('Knee → Feet → Box Jump','4×3','Reactive power chain.'),
-    tp?E('Race Rehearsal','Wk36+37: FULL simulation @ race pace. Wk38: openers only.','Dress rehearsal.'):E('Half-Sim (short)','3×1km compromised, 2 stations','CAPPED session — done by noon, bartend tonight.'),
-    E('DB Walking Lunges + Step-up Reverse Lunge','3×10 each + 3×5 each @ '+lw(RM.stepup,w),'Station 6 pattern under fatigue.'),
-    E('Nordic Curls + Hamstring Sliders',corrSets(w)+'×5-6 + 3×10','HAMSTRING REBUILD. Eccentric + lengthened. The missing link.'),
-    E('SL-RDL','3×8 each @ 55 DB','Unilateral hinge. Protective for the run volume.'),
-    E('Seated Calf Raise','3×15','Soleus — the tight one in runners. Bent-knee dose.'),
-    E('Skipping','10 min continuous','Calf-Achilles spring.'),
-    E('Cossacks + Goblet Cossack Folds + Pancake GMs','2×6 each · 2×5 each · 2×8','Hip strength-mobility (in warmup/finisher).')]};
-  return{title:'RECOVERY',main:[E('Rest','Cold plunge · easy walk · full mobility.','Winners recover like professionals.')]};
+
+  if(d===5)return{title:'PLYO + HALF-SIM + POSTERIOR (75 CAP)',main:[
+    E('PLYO BATTERY','Knee→Feet→Box 4×3 · Jump Lunges (wtd→BW explosive) 3×6 · SL Banded High Knees 3×12 · Pogos 2×20','Bouncy as fuck. Full recovery between sets.'),
+    tp?E('Race Rehearsal','Wk36-37: FULL sim @ race pace. Wk38: openers.','Dress rehearsal.'):E('Half-Sim','3×1km compromised, 2 stations','Done by noon.'),
+    E('BB Step-up Reverse Lunge',(dl?'3×4':'4×5')+' each @ '+lw(RM.stepup,w)+' lbs','The single-leg anchor.'),
+    E('Cossack Squats','3×6 each @ '+lw(RM.cossack,w)+' lbs','Strength at range nobody owns.'),
+    E('Nordic Curls + Hamstring Sliders','3×5 + 3×10','Posterior insurance.'),
+    E('SL-RDL','3×8 each @ 55 DB','Unilateral hinge.'),
+    E('ROTATION POWER','Med Ball Lateral Slams 4×5 each · Sit-up Ball Throws 3×10','Trunk violence.'),
+    E('Seated Calf + Skipping','3×15 + 10 min','Soleus + spring.'),
+    calvesDaily(true)]};
+
+  return{title:'RECOVERY + FULL YOGA',main:[
+    E('FULL YOGA (40 min)','Sun salutations → standing flow → hip series (pigeon, lizard, frog) → twists + bridge→wheel → splits work → savasana','The weekly reset. Mobility mission advanced here.'),
+    E('Cold Plunge','5-10 min',''),
+    E('Calf stretches + toe/feet work','in the flow','Even today the daily law holds, gently.'),
+    E('Easy walk + meal prep','—','The quiet weapons. Sleep in. No alarm.')]};
 }
 
-// ═══ DAILY 9-MOBILITY PROTOCOL ═══
 function getMobility(w,d){
   const ph=getPhaseNum(w);const hold=ph===1?'45s':ph===2?'60s':'75s';
-  if(d===6)return{title:'RECOVERY',focus:'Off',duration:'40 min',options:[
-    E('Cold Plunge','5-10 min',''),E('Full 9-Protocol + Splits','30 min','Everything, unhurried.'),E('Easy walk','20-30 min optional','')]};
-  return{title:'11-MOBILITY + SPLITS',focus:'Daily',duration:'18-22 min',options:[
-    E('READINESS CHECK','RHR + feel 1-5, 30 seconds','RHR up 5+ bpm 3 days straight = drop today one intensity tier. The early-warning system.'),
-    E('LOWER: 90/90 · Couch Stretch · Deep Squat w/ movement','2 min · 90s each · 2 min','Hips that absorb 40+ km/week.'),
-    E('FEET: Ball Roll Arch · Toe Spreads + Short-Foot','90s each · 2 min barefoot','Stop the gripping. Extra L big toe.'),
-    E('CALVES: Straight-Knee + Bent-Knee Stretch','60s each, each side','Gastroc + soleus. The soleus carries your kms.'),
-    E('UPPER FRONT: Reverse Crab · Bridge · Doorway w/ rotation','8 reps · 3×20s · 60s each','Open the front line.'),
-    E('UPPER BACK: T-Spine Rotation · Bench Flex/Extend · Dead Hang','10 each · 10 · 60s','Rotation + decompression.'),
-    E('SPLITS: Forward + Lateral','3×'+hold+' each','Daily. Warm only. Full splits both ways by Madrid.')]};
+  if(d===6)return{title:'RECOVERY DAY',focus:'Yoga is the session',duration:'—',options:[
+    E('See session tab','Full yoga practice is today\\u2019s work','')]};
+  return{title:'DAILY PROTOCOL',focus:'Every day',duration:'15-20 min',options:[
+    E('READINESS CHECK','RHR + feel 1-5, 30 sec','+5 bpm ×3 days = drop a tier.'),
+    E('LOWER: 90/90 · Couch · Deep Squat','2min · 90s ea · 2min','Hips absorb the volume.'),
+    E('FEET: Ball Roll · FEET SPREADING + Short-Foot','90s ea · 2min barefoot','Your list — daily.'),
+    E('CALVES: Straight + Bent-Knee Stretch','60s each side','Gastroc + soleus.'),
+    E('UPPER: Reverse Crab · Doorway · T-Spine · Dead Hang','8 · 60s ea · 10 · 60s','Front line + rotation + decompression.'),
+    E('SPLITS: Forward + Lateral','3×'+hold+' each','Daily. Warm only. Full splits by Madrid.')]};
 }
 
 function getDayData(w,d){
-  if(d===6){
-    const m=getMobility(w,6);
-    return{run:{title:'RECOVERY',focus:'Restore',duration:'40 min',exercises:[E('Cold Plunge','5-10 min',''),E('9-Protocol + Splits','30 min',''),E('Easy walk','optional','')]},
-      am:{title:'RECOVERY',focus:'Rest',duration:'',conditioning:[],core:[],rings:[]},
-      pm:{title:'RECOVERY',focus:'Rest',duration:'',prep:[],iso:[],main:[E('Rest','After 3 straight bar nights this is survival, not luxury. Sleep in — no alarm. Meal prep = the quiet weapon.','')],conditioning:[]},
-      eve:m};
-  }
   const s=getSession(w,d);
-  const amTitle=['SIM DAY','UPPER + SKI','THRESHOLD DAY','EASY + BAR NIGHT','FLEX + BAR NIGHT','POWER (CAP) + BAR NIGHT'][d];
+  if(d===6){
+    return{run:{title:'RECOVERY + YOGA',focus:'Restore',duration:'~60 min',exercises:s.main},
+      am:{title:s.title,focus:'Rest',duration:'',conditioning:[],core:[],rings:[]},
+      pm:{title:s.title,focus:'Rest + Yoga',duration:'~60 min',prep:[],iso:[],main:s.main,conditioning:[]},
+      eve:getMobility(w,6)};
+  }
+  const amTitle=['SIM DAY','POWER+ELITE','THRESHOLD','ENGINE+PILATES','FLEX','PLYO+SIM'][d];
   return{
-    run:{title:amTitle,focus:getPhase(w).n+' · Wk '+w+'/38',duration:'',exercises:[E(getPhase(w).n+' PHASE',getPhase(w).desc,''),E('Focus',focusLabel(w),'')]},
+    run:{title:amTitle,focus:getPhase(w).n+' · Wk '+w+'/38',duration:'',exercises:[E(getPhase(w).n,getPhase(w).desc,''),E('Focus',focusLabel(w),''),E('Wall Ball Project','Current target: '+wbTarget(w)+' unbroken','100 by January.')]},
     am:{title:s.title,focus:focusLabel(w),duration:'',conditioning:[],core:[],rings:[]},
-    pm:{title:s.title,focus:focusLabel(w),duration:'75-100 min',prep:[],iso:[],main:s.main,conditioning:[]},
+    pm:{title:s.title,focus:focusLabel(w),duration:'~75-95 min',prep:[],iso:[],main:s.main,conditioning:[]},
     eve:getMobility(w,d)
   };
 }
@@ -279,7 +290,7 @@ function load(k,d){try{const v=localStorage.getItem('r42_'+k);return v?JSON.pars
 
 let _completions={};
 let _exDone=JSON.parse(localStorage.getItem('r42_exdone')||'{}');
-const PROG_VER='hyrox3';
+const PROG_VER='hyrox6';
 function saveExDone(){try{localStorage.setItem('r42_exdone',JSON.stringify(_exDone))}catch(e){}}
 function toggleExDone(eid,ev){if(ev)ev.stopPropagation();_exDone[eid]=!_exDone[eid];saveExDone();const el=document.querySelector('[data-eid="'+eid+'"]');if(el){el.classList.toggle('done',!!_exDone[eid])}}  // movement-first program — only count completions from this version
 function getCompletions(){return _completions}
@@ -389,7 +400,7 @@ function toggleBlock(block){
 }
 
 function exHTML(ex,section,idx){
-  const eid=`${curWeek}_${curDay}_${section}_${idx}`;const parsed=parseExercise(ex.detail,ex.name);const numSets=parsed.sets;const logged=getSetLog(eid);const targetWt=calcTarget(ex.name,parsed.pct,ex.detail);
+  const eid=`${PROG_VER}_${curWeek}_${curDay}_${section}_${idx}`;const parsed=parseExercise(ex.detail,ex.name);const numSets=parsed.sets;const logged=getSetLog(eid);const targetWt=calcTarget(ex.name,parsed.pct,ex.detail);
   const isTimeBased=isTimeExercise(ex.name,ex.detail);const isCarry=/farmer|carry|carries/i.test(ex.name);
   const allSaved=numSets>0&&Object.keys(logged).length>=numSets&&Object.values(logged).every(v=>v&&v.saved);
   const doneCls=(_exDone[eid]||allSaved)?' done':'';
